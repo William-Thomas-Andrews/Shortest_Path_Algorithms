@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <queue>
 #include "UnionFind.hpp"
+#include "Compare.hpp"
 
 
 using Vertex = unsigned long;
@@ -27,9 +29,13 @@ class Edge {
             return str;
         }
 
-        Vertex get_left() { return v; }
-        Vertex get_right() { return u; }
+        Vertex get_left() const { return v; }
+        Vertex get_right() const { return u; }
         Weight get_weight() { return weight; }
+        Vertex get_other(Vertex v) const { 
+            if (this->get_left() == v) { return this->get_right(); }
+            if (this->get_right() == v) { return this->get_left(); }
+        }
 
         void set_weight(Weight w) { weight = w; }
 
@@ -154,8 +160,26 @@ class Graph {
         }
 
         
-        std::vector<Edge> A_Star() {
+        std::vector<Vertex> A_Star(Vertex v, Vertex end) {
             // Basically without heuristics just push things onto a heap and perform on each turn the lowest one, popping each time and adding neighbors to the heap.
+            std::vector<Vertex> path(1, v);
+            std::priority_queue<Edge, std::vector<Edge>, Compare<Edge>> pq;
+            while (true) {
+                for (Vertex u : path) {
+                    for (Edge& e : adj[u]) {
+                        if (e.get_other(u) == end) { // Then we have found the end point and we return the best path we found
+                            return path; 
+                        }
+                        pq.push(e);
+                    }
+                }
+                // std::cout << pq.top() << std::endl;
+                path.push_back(pq.top().get_right());
+                pq.pop();
+            }
+            // Once done, add lots of heuristics and test. Then add a fancy visual and keep testing.
+            // Once done, study and add the neural network.
+            // If possible, try to integrate this into osm stuff.
         }
         
         
