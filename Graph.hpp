@@ -163,18 +163,36 @@ class Graph {
         std::vector<Vertex> A_Star(Vertex v, Vertex end) {
             // Basically without heuristics just push things onto a heap and perform on each turn the lowest one, popping each time and adding neighbors to the heap.
             std::vector<Vertex> path(1, v);
+            UnionFind union_collection;
             std::priority_queue<Edge, std::vector<Edge>, Compare<Edge>> pq;
-            while (true) {
+            while (!pq.empty()) {
                 for (Vertex u : path) {
                     for (Edge& e : adj[u]) {
                         if (e.get_other(u) == end) { // Then we have found the end point and we return the best path we found
+                            path.push_back(end);
                             return path; 
                         }
                         pq.push(e);
                     }
                 }
                 // std::cout << pq.top() << std::endl;
-                path.push_back(pq.top().get_right());
+                // Now we make a decision and repeat
+                if (union_collection.get_size() == 0) {
+                    union_collection.union_operation(v, pq.top().get_other(v));
+                    path.push_back(pq.top().get_other(v));
+                    pq.pop();
+                    continue;
+                }
+                Vertex left = pq.top().get_left();
+                Vertex right = pq.top().get_right();
+                if (union_collection.find_operation(left) == union_collection.find_operation(v)) { // the old (used) vertex
+                    path.push_back(right); // the new vertex
+                    union_collection.union_operation(right, v);
+                }
+                else if (union_collection.find_operation(right) == union_collection.find_operation(v)) { // the old (used) vertex
+                    path.push_back(left); // the new vertex
+                    union_collection.union_operation(left, v);
+                }
                 pq.pop();
             }
             // Once done, add lots of heuristics and test. Then add a fancy visual and keep testing.

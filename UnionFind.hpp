@@ -3,9 +3,10 @@ using Vertex = unsigned long;
 class UnionFind {
     private:
         std::vector<int> union_data;
+        int size;
     public:
-        UnionFind() {}
-        UnionFind(int size) : union_data(size, -1) {}
+        UnionFind() : size(0) {}
+        UnionFind(int size) : union_data(size, -1), size(size) {}
         
         void union_operation(Vertex v, Vertex u) {
             if (v >= union_data.size()) {
@@ -59,6 +60,10 @@ class UnionFind {
                 str += "(" + std::to_string(i) + ", " + std::to_string(union_data[i]) + ") ";
             }
             return str;
+        }
+
+        int get_size() {
+            return union_data.size(); // not quite
         }
 
         friend std::ostream& operator<<(std::ostream& os, UnionFind union_set);
