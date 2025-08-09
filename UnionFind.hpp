@@ -3,12 +3,15 @@ using Vertex = unsigned long;
 class UnionFind {
     private:
         std::vector<int> union_data;
-        int size;
+        bool empty;
     public:
-        UnionFind() : size(0) {}
-        UnionFind(int size) : union_data(size, -1), size(size) {}
+        UnionFind() : empty(true) {}
+        UnionFind(int size) : union_data(size, -1), empty(false ? size <= 0 : true) {}
         
         void union_operation(Vertex v, Vertex u) {
+            if (empty) {
+                empty = false;
+            }
             if (v >= union_data.size()) {
                 while (union_data.size() <= v) {
                     union_data.push_back(-1);
@@ -62,8 +65,8 @@ class UnionFind {
             return str;
         }
 
-        int get_size() {
-            return union_data.size(); // not quite
+        bool is_empty() {
+            return empty;
         }
 
         friend std::ostream& operator<<(std::ostream& os, UnionFind union_set);

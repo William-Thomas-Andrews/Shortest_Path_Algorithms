@@ -20,6 +20,6 @@ class MaxCompare {
 template <typename ELEMENT>
 struct Compare {
     bool operator()(ELEMENT edge1, ELEMENT edge2) {
-        return (edge1.get_weight() < edge2.get_weight());
+        return (edge1.get_weight() > edge2.get_weight());
     }
 };
