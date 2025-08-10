@@ -5,16 +5,41 @@
 #include "UnionFind.hpp"
 #include "Compare.hpp"
 
-void print_path(const std::vector<Vertex> &path) {
-    std::cout << "Path: ";
-    for (Vertex v : path) {
-        std::cout << v << " ";
-    }
-    std::cout << std::endl;
-}
 
-using Vertex = unsigned long;
+
+// using Vertex = unsigned long;
 using Weight = unsigned long;
+using Coordinate = signed long;
+signed long max_val = 10; // Coordinate max value
+signed long min_val = -10; // Coordinate min value
+
+struct Vertex {
+    int val;
+    int x = rand() % (max_val - min_val + 1) + min_val; // x-coordinate
+    int y = rand() % (max_val - min_val + 1) + min_val; // y-coordinate
+    bool operator==(const Vertex& other) const {
+        return val == other.val;
+    }
+    bool operator!=(const Vertex& other) const {
+        return val != other.val;
+    }
+    bool operator>(const Vertex& other) const {
+        return val > other.val;
+    }
+    bool operator<(const Vertex& other) const {
+        return val < other.val;
+    }
+    Vertex() {}
+    Vertex(int v0, int x0, int y0) : val(v0), x(x0), y(y0) {}
+};
+
+// void print_path(const std::vector<Vertex> &path) {
+//     std::cout << "Path: ";
+//     for (Vertex v : path) {
+//         std::cout << v.val << " ";
+//     }
+//     std::cout << std::endl;
+// }
 
 // Corresponds to the Edge type for Graphic Matroids
 class Edge {
@@ -22,17 +47,18 @@ class Edge {
         Vertex v;
         Vertex u;
         Weight weight;
+
     public:
         Edge() {}
         Edge(Vertex v1, Vertex v2, Weight w) : v(v1 > v2 ? v1 : v2), u(v1 > v2 ? v2 : v1), weight(w) {}
 
         std::string get_string() {
-            std::string str = "(" + std::to_string(v) + " - " + std::to_string(u) + ")" + "(" + std::to_string(weight) + ")";
+            std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
             return str;
         }
 
         const std::string get_string() const {
-            std::string str = "(" + std::to_string(v) + " - " + std::to_string(u) + ")" + "(" + std::to_string(weight) + ")";
+            std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
             return str;
         }
 
@@ -40,8 +66,8 @@ class Edge {
         Vertex get_right() const { return u; }
         Weight get_weight() { return weight; }
         Vertex get_other(Vertex v) const { 
-            if (this->get_left() == v) { return this->get_right(); }
-            if (this->get_right() == v) { return this->get_left(); }
+            if (this->get_left().val == v.val) { return this->get_right(); }
+            if (this->get_right().val == v.val) { return this->get_left(); }
         }
 
         void set_weight(Weight w) { weight = w; }
@@ -58,7 +84,7 @@ class Edge {
 
         // Comparison operator ==
         bool operator==(Edge& e2) {
-            if (v == e2.get_left() and u == e2.get_right() and weight == e2.get_weight()) return true;
+            if (v.val == e2.get_left().val and u.val == e2.get_right().val and weight == e2.get_weight()) return true;
             return false;
         }
 
@@ -94,9 +120,9 @@ class Graph {
             for (auto x : input_data) {
                 Edge e = Edge(std::get<0>(x), std::get<1>(x), std::get<2>(x));
                 this->add_element(e);
-                union_set.union_operation(e.get_left(), e.get_right());
-                adj[e.get_left()].push_back(e);
-                adj[e.get_right()].push_back(e);
+                union_set.union_operation(e.get_left().val, e.get_right().val);
+                adj[e.get_left().val].push_back(e);
+                adj[e.get_right().val].push_back(e);
             }
         }
         Graph(std::vector<Edge> input_data) : union_set(UnionFind(input_data.size())) {
@@ -106,9 +132,9 @@ class Graph {
             adj.resize(input_data.size()*2);
             for (Edge e : input_data) {
                 this->add_element(e);
-                union_set.union_operation(e.get_left(), e.get_right());
-                adj[e.get_left()].push_back(e);
-                adj[e.get_right()].push_back(e);
+                union_set.union_operation(e.get_left().val, e.get_right().val);
+                adj[e.get_left().val].push_back(e);
+                adj[e.get_right().val].push_back(e);
             }
         }
 
@@ -142,9 +168,9 @@ class Graph {
 
         void add_element(Edge e) {
             edges.push_back(e);
-            union_set.union_operation(e.get_left(), e.get_right());
-            adj[e.get_left()].push_back(e);
-            adj[e.get_right()].push_back(e);
+            union_set.union_operation(e.get_left().val, e.get_right().val);
+            adj[e.get_left().val].push_back(e);
+            adj[e.get_right().val].push_back(e);
         }
 
         // void pop() {
@@ -170,92 +196,41 @@ class Graph {
             return str;
         }
 
-        bool in (Vertex v, std::vector<Vertex> vertices) {
+        bool in (int val, std::vector<Vertex> vertices) {
             for (Vertex x : vertices) {
-                if (v == x) { return true; }
+                if (val == x.val) { return true; }
             }
             return false;
         }
 
+        signed long potential(Vertex start, Vertex end) {
+            return std::sqrt( std::pow((start.x - end.x), 2) + std::pow((start.y - end.y), 2) );
+        }
+
+        void reweight(Edge& edge, Vertex subject, Vertex end) {
+            std::cout << "Potential: " << potential(edge.get_other(subject), end) << ". Potential: " << potential(subject, end) << std::endl;
+            edge.set_weight(edge.get_weight() + potential(edge.get_other(subject), end) - potential(subject, end));
+        }
         
-        std::tuple<std::vector<double>, std::vector<Vertex>> Dijkstra(Vertex v, Vertex end) {
-            // Basically without heuristics just push things onto a heap and perform on each turn the lowest one, popping each time and adding neighbors to the heap.
-            // std::vector<Vertex> path(1, v);
-            // UnionFind union_collection;
-            // std::priority_queue<Edge, std::vector<Edge>, Compare<Edge>> pq;
-            // int counter = edges.size();
-            // while (true) {
-            //     print_path(path);
-            //     for (Vertex u : path) {
-            //         for (Edge& e : adj[u]) {
-            //             if (union_collection.find_operation(e.get_left()) != union_collection.find_operation(e.get_right())) {
-            //                 // std::cout << union_collection.find_operation(e.get_left()) << std::endl;
-            //                 std::cout << e.get_left() << std::endl;
-            //                 std::cout << e.get_right() << std::endl;
-            //                 pq.push(e);
-            //             }
-            //         }
-            //     }
-            //     std::cout << pq.top() << std::endl;
+        std::tuple<std::vector<double>, std::vector<int>> Dijkstra(Vertex v, Vertex end) {
 
-            //     // Now we make a decision and repeat
-            //     if (union_collection.is_empty()) {
-            //         union_collection.union_operation(v, pq.top().get_other(v));
-            //         path.push_back(pq.top().get_other(v));
-            //         pq.pop();
-            //         continue;
-            //     }
-            //     Vertex left = pq.top().get_left();
-            //     Vertex right = pq.top().get_right();
-            //     // If there is a cycle or a used edge
-            //     // while (union_collection.find_operation(left) == union_collection.find_operation(v) and union_collection.find_operation(right) == union_collection.find_operation(v)) {
-            //     //     pq.pop();
-            //     //     left = pq.top().get_left();
-            //     //     right = pq.top().get_right();
-            //     // }
-            //     // If the left vertex is already in the used vertices
-            //     if (union_collection.find_operation(left) == union_collection.find_operation(v)) { // the old (used) vertex
-            //         path.push_back(right); // the new vertex
-            //         if (right == end) { // Then we have found the end point and we return the best path we found
-            //             // path.push_back(end);
-            //             return path;
-            //         }
-            //         std::cout << "here" << std::endl;
-            //         union_collection.union_operation(right, v);
-            //     }
-            //     // If the right vertex is already in the used vertices
-            //     else if (union_collection.find_operation(right) == union_collection.find_operation(v)) { // the old (used) vertex
-            //         path.push_back(left); // the new vertex
-            //         if (left == end) { // Then we have found the end point and we return the best path we found
-            //             // path.push_back(end);
-            //             return path; 
-            //         }
-            //         union_collection.union_operation(left, v);
-
-            //     }
-            //     pq.pop();
-            //     counter--;
-            //     if (counter < 0) {
-            //         std::cout << "fail" << std::endl;
-            //         return path;
-            //     }
-            // }
-            // return path;
-            // Once done, add lots of heuristics and test. Then add a fancy visual and keep testing.
+            // TODO: Construct lots of examples to test this heuristic. Add a visualization. Keep testing, compare to Dijkstra's normal.
+            // TODO: Make it make decisions sequentially in the visualization (add a wait time after each move).
             // Once done, study and add the neural network.
+            // Try to make it live and changing.
             // If possible, try to integrate this into osm stuff.
 
 
             double inf = 1.0/ 0.0;  // Set this to infinity.
             std::vector<double> dist(adj.size(), inf);
-            std::vector<Vertex> prev(adj.size(), -1);
+            std::vector<int> prev(adj.size(), -1);
 
             // Contains previous wedges and their weights for adding to 'count' variable // Actually not needed if you use dist and prev
             // std::vector<std::tuple<Weighted_Edge, double>> prev_edges(G.V(), std::tuple<Weighted_Edge, double>());
 
             // Update with starting vertex
-            dist[v] = 0; // update dist
-            prev[v] = v; // update prev
+            dist[v.val] = 0; // update dist
+            prev[v.val] = v.val; // update prev
 
             // The minimum priority queue pq stores the edges by edge weight.
             auto compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
@@ -268,28 +243,42 @@ class Graph {
             std::vector<Vertex> pivot_vertices = {v};
             // TODO UnionFind pivot_union = UnionFind(adj.size());
 
-            std::cout << adj.size() << "he" << std::endl;
             // Iterate through number of 'turns'
             for (int i = 0; i < adj.size()-1; i++) {
                 // Iterate through pivot (used) vertices
                 for (Vertex pivot_vertex : pivot_vertices) {
                     // Iterate through options per pivot vertex
-                    for (auto edge : adj[pivot_vertex]) {
+                    for (auto edge : adj[pivot_vertex.val]) {
                         // If adding the pivot vertex would not form a cycle (if the edge would not connect the same partition)
-                        if (union_set.find_operation(pivot_vertex) != union_set.find_operation(edge.get_other(pivot_vertex))) {
+                        if (union_set.find_operation(pivot_vertex.val) != union_set.find_operation(edge.get_other(pivot_vertex).val)) {
                             // If the distance can be improved
-                            if (dist[edge.get_other(pivot_vertex)] > (dist[pivot_vertex] + edge.get_weight())) {
+                            if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) {
                                 // Then update the dist vector with new dist
-                                dist[edge.get_other(pivot_vertex)] = (dist[pivot_vertex] + edge.get_weight());
-                                Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), dist[edge.get_other(pivot_vertex)]);
+                                dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight());
+                                Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), dist[edge.get_other(pivot_vertex).val]);
+                                std::cout << "Past weight: " << new_edge.get_weight() << std::endl;
+                                if (in(new_edge.get_left().val, pivot_vertices)) {
+                                    reweight(new_edge, new_edge.get_right(), end);
+                                }
+                                else {
+                                    reweight(new_edge, new_edge.get_left(), end);
+                                }
+                                std::cout << "New weight: " << new_edge.get_weight() << std::endl;
                                 // Then push it to the queue
                                 pq.push(new_edge);
-
                             }
                             // If it cannot be improved
                             else {
                                 // Update dist vector with old dist + weight
-                                Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), edge.get_weight()+dist[pivot_vertex]);
+                                Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), edge.get_weight()+dist[pivot_vertex.val]);
+                                std::cout << "Past weight: " << new_edge.get_weight() << std::endl;
+                                if (in(new_edge.get_left().val, pivot_vertices)) {
+                                    reweight(new_edge, new_edge.get_right(), end);
+                                }
+                                else {
+                                    reweight(new_edge, new_edge.get_left(), end);
+                                }
+                                std::cout << "New weight: " << new_edge.get_weight() << std::endl;
                                 // Then push it to the queue
                                 pq.push(new_edge);
                             }
@@ -299,18 +288,19 @@ class Graph {
                 // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
                 if (pq.empty()) { return std::tuple(dist, prev); }
                 Edge best = pq.top(); pq.pop();
+                std::cout << "=======We chose the best: " << best << std::endl;
                 Vertex first_vertex, second_vertex, old_vertex, new_vertex;
                 first_vertex = best.get_left(); second_vertex = best.get_right();
-                bool in_first = in(first_vertex, pivot_vertices);
-                bool in_second = in(second_vertex, pivot_vertices);
+                bool in_first = in(first_vertex.val, pivot_vertices);
+                bool in_second = in(second_vertex.val, pivot_vertices);
                 // If connecting two disjoint trees in an edge with two used vertices
                 if (in_first and in_second) {
                     // Decide which edge comes first in prev
-                    if (union_set.find_operation(first_vertex) == v) {
+                    if (union_set.find_operation(first_vertex.val) == v.val) {
                         old_vertex = first_vertex;
                         new_vertex = second_vertex;
                     }
-                    else if (union_set.find_operation(second_vertex) == v) {
+                    else if (union_set.find_operation(second_vertex.val) == v.val) {
                         old_vertex = second_vertex;
                         new_vertex = first_vertex;
                     }
@@ -325,7 +315,7 @@ class Graph {
                     new_vertex = first_vertex;
                 }
 
-                prev[new_vertex] = old_vertex;
+                prev[new_vertex.val] = old_vertex.val;
 
                 // // Update prev
                 // if (in(best.either(), pivot_vertices)) {
@@ -342,7 +332,7 @@ class Graph {
                 // Add to the used vertices
                 pivot_vertices.push_back(new_vertex);
                 // Union the rest
-                union_set.union_operation(best.get_left(), best.get_right());
+                union_set.union_operation(best.get_left().val, best.get_right().val);
                 // And pop the rest of the edges out
                 while (!pq.empty()) {
                     pq.pop();

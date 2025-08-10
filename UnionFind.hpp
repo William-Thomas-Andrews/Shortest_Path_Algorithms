@@ -1,4 +1,4 @@
-using Vertex = unsigned long;
+// using Vertex = unsigned long;
 
 class UnionFind {
     private:
@@ -8,7 +8,7 @@ class UnionFind {
         UnionFind() : empty(true) {}
         UnionFind(int size) : union_data(size, -1), empty(false ? size <= 0 : true) {}
         
-        void union_operation(Vertex v, Vertex u) {
+        void union_operation(int v, int u) {
             if (empty) {
                 empty = false;
             }
@@ -22,8 +22,8 @@ class UnionFind {
                     union_data.push_back(-1);
                 }
             }
-            Vertex v_index = find_operation(v);
-            Vertex u_index = find_operation(u);
+            int v_index = find_operation(v);
+            int u_index = find_operation(u);
             if (v_index == u_index) return;
             if (union_data[v_index] < union_data[u_index]) {
                 union_data[v_index] += union_data[u_index];
@@ -35,7 +35,7 @@ class UnionFind {
             }
         }
 
-        Vertex find_operation(Vertex v) {
+        int find_operation(int v) {
             if (v >= union_data.size()) {
                 while (union_data.size() <= v) {
                     union_data.push_back(-1);
