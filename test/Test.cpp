@@ -3,8 +3,7 @@
 #include <cassert>
 #include <vector>
 #include <tuple>
-#include "folly/dynamic.h"
-#include "folly/json.h"
+
 #include "Graph.hpp"
 
 void print_path(const std::vector<int>& prev, int start, int end) {
@@ -61,29 +60,9 @@ int main() {
         assert(prev[1] == 3);
     }
 
-
-
-    // ==== Folly json testing ====
-    std::string filepath = "../src/data_1.txt"; // Filename
-    std::string output = "";
-    std::ifstream file(filepath);
-    std::string line;
-
-    while (std::getline(file, line)) {
-        // std::cout << line << std::endl;
-        output += line; // append() copies the argument passed as a reference(std::string&)
-    }
-
-    // std::ifstream file("Read.txt");
-    // std::string str; 
-    // while (std::getline(file, str))
-    // {
-    //     // Process str
-    // }
-    std::cout << output << std::endl;
-    folly::dynamic data = folly::parseJson(output);
-    std::cout << data["vertices"][2]["id"].asString() << std::endl; 
-    //
+    // Input data test
+    Graph Gi = Graph("../src/data_1.txt");
+    std::cout << Gi << std::endl;
 
 
     // // === Test Case 3: Unreachable node ===

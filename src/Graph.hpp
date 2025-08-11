@@ -2,7 +2,8 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
-
+#include "folly/dynamic.h"
+#include "folly/json.h"
 #include "UnionFind.hpp"
 // #include "Compare.hpp"
 
@@ -57,12 +58,11 @@ class Edge {
             std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
             return str;
         }
-
         const std::string get_string() const {
             std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
             return str;
         }
-
+        
         Vertex get_left() const { return v; }
         Vertex get_right() const { return u; }
         Weight get_weight() { return weight; }
@@ -70,25 +70,21 @@ class Edge {
             if (this->get_left().val == v.val) { return this->get_right(); }
             if (this->get_right().val == v.val) { return this->get_left(); }
         }
-
         void set_weight(Weight w) { weight = w; }
-
+        
         // Comparison operator <
         bool operator<(Edge& e2) {
             return (weight < e2.get_weight());
         }
-
         // Comparison operator >
         bool operator>(Edge& e2) {
             return (weight > e2.get_weight());
         }
-
         // Comparison operator ==
         bool operator==(Edge& e2) {
             if (v.val == e2.get_left().val and u.val == e2.get_right().val and weight == e2.get_weight()) return true;
             return false;
         }
-
         // Comparison operator !=
         bool operator!=(Edge& e2) {
             return (weight != e2.get_weight());
@@ -102,7 +98,6 @@ std::ostream& operator<<(std::ostream& os, Edge& e) {
     os << e.get_string();
     return os;
 }
-
 std::ostream& operator<<(std::ostream& os, const Edge& e) {
     os << e.get_string();
     return os;
@@ -121,31 +116,38 @@ class Graph {
             for (auto x : input_data) {
                 Edge e = Edge(std::get<0>(x), std::get<1>(x), std::get<2>(x));
                 this->add_element(e);
-                union_set.union_operation(e.get_left().val, e.get_right().val);
-                adj[e.get_left().val].push_back(e);
-                adj[e.get_right().val].push_back(e);
             }
         }
         Graph(std::vector<Edge> input_data) : union_set(UnionFind(input_data.size())) {
             adj.resize(input_data.size()*2);
             for (Edge e : input_data) {
                 this->add_element(e);
-                union_set.union_operation(e.get_left().val, e.get_right().val);
-                adj[e.get_left().val].push_back(e);
-                adj[e.get_right().val].push_back(e);
             }
         }
-        // Graph(std::string file_name) {
-        //     // union_set(UnionFind(input_data.size()))
-        //     // Then read file put into json dynamic data array, then read the array properly
-        //     adj.resize(input_data.size()*2);
-        //     for (Edge e : input_data) {
-        //         this->add_element(e);
-        //         union_set.union_operation(e.get_left().val, e.get_right().val);
-        //         adj[e.get_left().val].push_back(e);
-        //         adj[e.get_right().val].push_back(e);
-        //     }
-        // }
+        Graph(std::string file_path) {
+            folly::dynamic data = parse_json(file_path);
+            Vertex v1, v2;
+            Weight weight;
+            adj.resize(data["edges"].size() * 2);
+            for (auto edge : data["edges"]) {
+                v1 = Vertex( data["vertices"][edge["from"].asInt()]["id"].asInt(), 
+                    data["vertices"][edge["from"].asInt()]["x"].asInt(), 
+                    data["vertices"][edge["from"].asInt()]["y"].asInt() );
+                v2 = Vertex( data["vertices"][edge["to"].asInt()]["id"].asInt(), 
+                    data["vertices"][edge["to"].asInt()]["x"].asInt(), 
+                    data["vertices"][edge["to"].asInt()]["y"].asInt() );
+                weight = edge["weight"].asInt();
+                this->add_element(Edge(v1, v2, weight));
+            }
+        }
+
+        folly::dynamic parse_json(std::string file_path) {
+            std::string output = "";
+            std::ifstream file(file_path);
+            std::string line;
+            while (std::getline(file, line)) { output += line; }
+            return folly::parseJson(output);
+        }
 
         // // Matroid functions begin --------------------------------------------------------------------------------------------------
         // void min_sort() {
@@ -230,7 +232,7 @@ class Graph {
             // If possible, try to integrate this into osm stuff.
 
 
-            double inf = 1.0/ 0.0;  // Set this to infinity.
+            double inf = 1.0/ 0.0; 
             std::vector<double> dist(adj.size(), inf);
             std::vector<int> prev(adj.size(), -1);
 
