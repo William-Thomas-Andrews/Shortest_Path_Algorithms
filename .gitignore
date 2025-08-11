@@ -37,6 +37,7 @@ CTestTestfile.cmake
 Makefile
 compile_commands.json
 install_manifest.txt
+Makefile
 
 
 # ---- Logs & temp ----
