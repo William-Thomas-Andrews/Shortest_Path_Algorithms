@@ -38,6 +38,7 @@ Makefile
 compile_commands.json
 install_manifest.txt
 
+
 # ---- Logs & temp ----
 *.log
 *.tmp
