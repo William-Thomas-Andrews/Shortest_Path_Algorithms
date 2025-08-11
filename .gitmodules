@@ -1,3 +1,6 @@
 [submodule "folly"]
 	path = build/folly
 	url = https://github.com/facebook/folly.git
+[submodule "build/folly"]
+	path = build/folly
+	url = https://github.com/facebook/folly.git
