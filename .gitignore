@@ -1,1 +1,3 @@
 *build/folly/
+git rm -r --cached build/folly/
+build/folly/
