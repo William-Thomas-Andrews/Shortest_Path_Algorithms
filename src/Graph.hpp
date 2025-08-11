@@ -2,8 +2,9 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+
 #include "UnionFind.hpp"
-#include "Compare.hpp"
+// #include "Compare.hpp"
 
 
 
@@ -126,9 +127,6 @@ class Graph {
             }
         }
         Graph(std::vector<Edge> input_data) : union_set(UnionFind(input_data.size())) {
-            // for (int i = 0; i < input_data.size(); i++) {
-            //     adj.r
-            // }
             adj.resize(input_data.size()*2);
             for (Edge e : input_data) {
                 this->add_element(e);
@@ -137,6 +135,17 @@ class Graph {
                 adj[e.get_right().val].push_back(e);
             }
         }
+        // Graph(std::string file_name) {
+        //     // union_set(UnionFind(input_data.size()))
+        //     // Then read file put into json dynamic data array, then read the array properly
+        //     adj.resize(input_data.size()*2);
+        //     for (Edge e : input_data) {
+        //         this->add_element(e);
+        //         union_set.union_operation(e.get_left().val, e.get_right().val);
+        //         adj[e.get_left().val].push_back(e);
+        //         adj[e.get_right().val].push_back(e);
+        //     }
+        // }
 
         // // Matroid functions begin --------------------------------------------------------------------------------------------------
         // void min_sort() {

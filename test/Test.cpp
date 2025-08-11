@@ -2,7 +2,9 @@
 #include <cassert>
 #include <vector>
 #include <tuple>
-#include "Graph.hpp"
+#include "../build/folly/folly/dynamic.h"
+#include "../build/folly/folly/json.h"
+#include "../src/Graph.hpp"
 
 void print_path(const std::vector<int>& prev, int start, int end) {
     std::vector<int> path;
