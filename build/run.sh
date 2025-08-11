@@ -1,3 +1,3 @@
 #! /bin/sh
 
-cd out/build ; ./SPG
+cd out/build ; ./bin/SPG

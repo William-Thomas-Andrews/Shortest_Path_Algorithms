@@ -1,8 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/SPG.dir/test/test.cpp.o"
   "CMakeFiles/SPG.dir/test/test.cpp.o.d"
-  "SPG"
-  "SPG.pdb"
+  "bin/SPG"
+  "bin/SPG.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

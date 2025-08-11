@@ -76,15 +76,15 @@ CMakeFiles/SPG.dir/test/test.cpp.o: CMakeFiles/SPG.dir/flags.make
 CMakeFiles/SPG.dir/test/test.cpp.o: /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp
 CMakeFiles/SPG.dir/test/test.cpp.o: CMakeFiles/SPG.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/SPG.dir/test/test.cpp.o"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/SPG.dir/test/test.cpp.o -MF CMakeFiles/SPG.dir/test/test.cpp.o.d -o CMakeFiles/SPG.dir/test/test.cpp.o -c /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/SPG.dir/test/test.cpp.o -MF CMakeFiles/SPG.dir/test/test.cpp.o.d -o CMakeFiles/SPG.dir/test/test.cpp.o -c /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp
 
 CMakeFiles/SPG.dir/test/test.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/SPG.dir/test/test.cpp.i"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp > CMakeFiles/SPG.dir/test/test.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp > CMakeFiles/SPG.dir/test/test.cpp.i
 
 CMakeFiles/SPG.dir/test/test.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/SPG.dir/test/test.cpp.s"
-	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp -o CMakeFiles/SPG.dir/test/test.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/test/test.cpp -o CMakeFiles/SPG.dir/test/test.cpp.s
 
 # Object files for target SPG
 SPG_OBJECTS = \
@@ -93,36 +93,36 @@ SPG_OBJECTS = \
 # External object files for target SPG
 SPG_EXTERNAL_OBJECTS =
 
-SPG: CMakeFiles/SPG.dir/test/test.cpp.o
-SPG: CMakeFiles/SPG.dir/build.make
-SPG: /opt/homebrew/lib/libfolly.0.58.0-dev.dylib
-SPG: /opt/homebrew/lib/libfmt.11.2.0.dylib
-SPG: /opt/homebrew/lib/libboost_context.dylib
-SPG: /opt/homebrew/lib/libboost_filesystem.dylib
-SPG: /opt/homebrew/lib/libboost_atomic.dylib
-SPG: /opt/homebrew/lib/libboost_program_options.dylib
-SPG: /opt/homebrew/lib/libboost_regex.dylib
-SPG: /opt/homebrew/lib/libboost_system.dylib
-SPG: /opt/homebrew/lib/libboost_thread.dylib
-SPG: /opt/homebrew/lib/libdouble-conversion.dylib
-SPG: /opt/homebrew/lib/libgflags.2.2.2.dylib
-SPG: /opt/homebrew/lib/libglog.dylib
-SPG: /opt/homebrew/lib/libevent.dylib
-SPG: /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/lib/libz.tbd
-SPG: /opt/homebrew/lib/libssl.dylib
-SPG: /opt/homebrew/lib/libcrypto.dylib
-SPG: /Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk/usr/lib/libbz2.tbd
-SPG: /opt/homebrew/lib/liblzma.dylib
-SPG: /opt/homebrew/lib/liblz4.dylib
-SPG: /opt/homebrew/lib/libzstd.dylib
-SPG: /opt/homebrew/lib/libsnappy.dylib
-SPG: /opt/homebrew/lib/libsodium.dylib
-SPG: CMakeFiles/SPG.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable SPG"
+bin/SPG: CMakeFiles/SPG.dir/test/test.cpp.o
+bin/SPG: CMakeFiles/SPG.dir/build.make
+bin/SPG: build/folly/libfolly.a
+bin/SPG: /opt/homebrew/lib/libfmt.11.2.0.dylib
+bin/SPG: /opt/homebrew/lib/libboost_context.dylib
+bin/SPG: /opt/homebrew/lib/libboost_filesystem.dylib
+bin/SPG: /opt/homebrew/lib/libboost_atomic.dylib
+bin/SPG: /opt/homebrew/lib/libboost_program_options.dylib
+bin/SPG: /opt/homebrew/lib/libboost_regex.dylib
+bin/SPG: /opt/homebrew/lib/libboost_system.dylib
+bin/SPG: /opt/homebrew/lib/libboost_thread.dylib
+bin/SPG: /opt/homebrew/lib/libdouble-conversion.dylib
+bin/SPG: /opt/homebrew/lib/libgflags.2.2.2.dylib
+bin/SPG: /opt/homebrew/lib/libglog.dylib
+bin/SPG: /opt/homebrew/lib/libevent.dylib
+bin/SPG: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libz.tbd
+bin/SPG: /opt/homebrew/Cellar/openssl@3/3.5.2/lib/libssl.dylib
+bin/SPG: /opt/homebrew/Cellar/openssl@3/3.5.2/lib/libcrypto.dylib
+bin/SPG: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/libbz2.tbd
+bin/SPG: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/liblzma.tbd
+bin/SPG: /opt/homebrew/lib/liblz4.dylib
+bin/SPG: /opt/homebrew/lib/libzstd.dylib
+bin/SPG: /opt/homebrew/lib/libsnappy.dylib
+bin/SPG: /opt/homebrew/lib/libsodium.dylib
+bin/SPG: CMakeFiles/SPG.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/willandrews/4dProjects/Shortest_Path/Shortest_Path_Algorithms/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable bin/SPG"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/SPG.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/SPG.dir/build: SPG
+CMakeFiles/SPG.dir/build: bin/SPG
 .PHONY : CMakeFiles/SPG.dir/build
 
 CMakeFiles/SPG.dir/clean:
