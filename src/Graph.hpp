@@ -11,15 +11,15 @@
 
 
 // using Vertex = unsigned long;
-using Weight = unsigned long;
+using Weight = signed long;
 using Coordinate = signed long;
 signed long max_val = 10; // Coordinate max value
 signed long min_val = -10; // Coordinate min value
 
 struct Vertex {
     int val;
-    int x = rand() % (max_val - min_val + 1) + min_val; // x-coordinate
-    int y = rand() % (max_val - min_val + 1) + min_val; // y-coordinate
+    double x = rand() % (max_val - min_val + 1) + min_val; // x-coordinate
+    double y = rand() % (max_val - min_val + 1) + min_val; // y-coordinate
     bool operator==(const Vertex& other) const {
         return val == other.val;
     }
@@ -220,14 +220,21 @@ class Graph {
             return std::sqrt( std::pow((start.x - end.x), 2) + std::pow((start.y - end.y), 2) );
         }
 
-        void reweight(Edge& edge, Vertex subject, Vertex end) {
-            std::cout << "Potential: " << potential(edge.get_other(subject), end) << ". Potential: " << potential(subject, end) << std::endl;
-            edge.set_weight(edge.get_weight() + potential(edge.get_other(subject), end) - potential(subject, end));
+        void reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
+            // int heuristic = potential(edge.get_other(subject), end) - potential(subject, end);
+            // int heuristic = potential(subject, end) - potential(edge.get_other(subject), end);
+            int heuristic = potential(leading_vertex, end); //+ potential(edge.get_other(leading_vertex), end);
+            std::cout << "-Potential: " << potential(edge.get_other(leading_vertex), end) << ". Potential: " << potential(leading_vertex, end) << ". Diff: " << heuristic << std::endl;
+            // edge.set_weight(edge.get_weight() + potential(edge.get_other(subject), end) - potential(subject, end)); // first
+            // edge.set_weight(edge.get_weight() + potential(subject, end) - potential(edge.get_other(subject), end));
+            // edge.set_weight(edge.get_weight() - potential(edge.get_other(subject), end) +  potential(subject, end));
+            edge.set_weight(edge.get_weight() + heuristic);
         }
         
         std::tuple<std::vector<double>, std::vector<int>> Dijkstra(Vertex v, Vertex end) {
 
-            // TODO: Construct lots of examples to test this heuristic. Add a visualization. Keep testing, compare to Dijkstra's normal.
+            
+            // TODO: Construct lots of examples to test this heuristic and new data loading format. Add a visualization. Keep testing, compare to Dijkstra's normal.
             // TODO: Make it make decisions sequentially in the visualization (add a wait time after each move).
             // Once done, study and add the neural network.
             // Try to make it live and changing.
@@ -269,7 +276,7 @@ class Graph {
                                 // Then update the dist vector with new dist
                                 dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight());
                                 Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), dist[edge.get_other(pivot_vertex).val]);
-                                std::cout << "Past weight: " << new_edge.get_weight() << std::endl;
+                                std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
                                 if (in(new_edge.get_left().val, pivot_vertices)) {
                                     reweight(new_edge, new_edge.get_right(), end);
                                 }
@@ -284,7 +291,7 @@ class Graph {
                             else {
                                 // Update dist vector with old dist + weight
                                 Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), edge.get_weight()+dist[pivot_vertex.val]);
-                                std::cout << "Past weight: " << new_edge.get_weight() << std::endl;
+                                std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
                                 if (in(new_edge.get_left().val, pivot_vertices)) {
                                     reweight(new_edge, new_edge.get_right(), end);
                                 }
