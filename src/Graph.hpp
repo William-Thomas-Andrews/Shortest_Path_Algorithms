@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <algorithm>
 #include <queue>
@@ -18,8 +19,8 @@ signed long min_val = -10; // Coordinate min value
 
 struct Vertex {
     int val;
-    double x = rand() % (max_val - min_val + 1) + min_val; // x-coordinate
-    double y = rand() % (max_val - min_val + 1) + min_val; // y-coordinate
+    int x = rand() % (max_val - min_val + 1) + min_val; // x-coordinate
+    int y = rand() % (max_val - min_val + 1) + min_val; // y-coordinate
     bool operator==(const Vertex& other) const {
         return val == other.val;
     }
@@ -110,33 +111,42 @@ class Graph {
         std::vector<Edge> edges;
         UnionFind union_set;
         std::vector<std::vector<Edge>> adj;
+        std::vector<Vertex> stored_vertices;
+        UnionFind union_vertices;
     public:
         Graph() {}
         Graph(int size) : union_set(UnionFind(size)), adj(size) {}
-        Graph(std::vector<std::tuple<Vertex, Vertex, Weight>> input_data) : union_set(UnionFind(input_data.size())) {
-            for (auto x : input_data) {
-                Edge e = Edge(std::get<0>(x), std::get<1>(x), std::get<2>(x));
-                this->add_element(e);
-            }
-        }
-        Graph(std::vector<Edge> input_data) : union_set(UnionFind(input_data.size())) {
-            adj.resize(input_data.size()*2);
-            for (Edge e : input_data) {
-                this->add_element(e);
-            }
-        }
+        // Graph(std::vector<std::tuple<Vertex, Vertex, Weight>> input_data) : union_set(UnionFind(input_data.size())) {
+        //     for (auto x : input_data) {
+        //         Edge e = Edge(std::get<0>(x), std::get<1>(x), std::get<2>(x));
+        //         this->add_element(e);
+        //     }
+        // }
+        // Graph(std::vector<Edge> input_data) : union_set(UnionFind(input_data.size())) {
+        //     adj.resize(input_data.size()*2);
+        //     for (Edge e : input_data) {
+        //         this->add_element(e);
+        //     }
+        // }
         Graph(std::string file_path) {
+            std::cout << file_path << std::endl;
             folly::dynamic data = parse_json(file_path);
             Vertex v1, v2;
             Weight weight;
             adj.resize(data["edges"].size() * 2);
             for (auto edge : data["edges"]) {
-                v1 = Vertex( data["vertices"][edge["from"].asInt()]["id"].asInt(), 
+                v1 = Vertex(
+                    data["vertices"][edge["from"].asInt()]["id"].asInt(), 
                     data["vertices"][edge["from"].asInt()]["x"].asInt(), 
-                    data["vertices"][edge["from"].asInt()]["y"].asInt() );
-                v2 = Vertex( data["vertices"][edge["to"].asInt()]["id"].asInt(), 
+                    data["vertices"][edge["from"].asInt()]["y"].asInt() 
+                );
+                if (!in(v1.val, stored_vertices)) { stored_vertices.push_back(v1); }
+                v2 = Vertex(
+                    data["vertices"][edge["to"].asInt()]["id"].asInt(), 
                     data["vertices"][edge["to"].asInt()]["x"].asInt(), 
-                    data["vertices"][edge["to"].asInt()]["y"].asInt() );
+                    data["vertices"][edge["to"].asInt()]["y"].asInt()
+                );
+                if (!in(v2.val, stored_vertices)) { stored_vertices.push_back(v2); }
                 weight = edge["weight"].asInt();
                 this->add_element(Edge(v1, v2, weight));
             }
@@ -149,6 +159,21 @@ class Graph {
             std::string line;
             while (std::getline(file, line)) { output += line; }
             return folly::parseJson(output);
+        }
+
+        std::tuple<Vertex, Vertex> get_random_vertex_pair() {
+            if (stored_vertices.size() < 2) {
+                throw std::runtime_error("Not enough vertices to form a pair.");
+            }
+            Vertex v1 = stored_vertices[rand() % stored_vertices.size()];
+            Vertex v2 = stored_vertices[rand() % stored_vertices.size()];
+            int count = 0;
+            while (v1 == v2) { 
+                v2 = stored_vertices[rand() % union_set.get_size()]; 
+                if (++count > 1000) throw std::runtime_error("Error in processing random vertices from the stored_vertices vector."); 
+            }
+            // std::cout << rand() % stored_vertices.size() << std::endl;
+            return {v1, v2};
         }
 
         // // Matroid functions begin --------------------------------------------------------------------------------------------------
@@ -233,8 +258,10 @@ class Graph {
         
         std::tuple<std::vector<double>, std::vector<int>> Dijkstra(Vertex v, Vertex end) {
 
-            
+
+            // Fix random number generation
             // TODO: Construct lots of examples to test this heuristic and new data loading format. Add a visualization. Keep testing, compare to Dijkstra's normal.
+            // TODO: Separate the Vertex and Edge class files into more files.
             // TODO: Make it make decisions sequentially in the visualization (add a wait time after each move).
             // Once done, study and add the neural network.
             // Try to make it live and changing.
@@ -353,7 +380,12 @@ class Graph {
                 pivot_vertices.push_back(new_vertex);
                 // Union the rest
                 union_set.union_operation(best.get_left().val, best.get_right().val);
-                // And pop the rest of the edges out
+                // If vertex found:
+                if (end.val == new_vertex.val) {
+                    std::cout << "We found edge number " << end.val << " with " << new_vertex.val << " !! :O" << std::endl;
+                    break;
+                }
+                // And if vertex not found, pop the rest of the edges out
                 while (!pq.empty()) {
                     pq.pop();
                     if (pq.size() > 10) return std::tuple(dist, prev);
@@ -363,7 +395,7 @@ class Graph {
             return std::tuple(dist, prev);
         }
         
-        
+    
         friend std::ostream& operator<<(std::ostream& os, Graph& G);
 };
 

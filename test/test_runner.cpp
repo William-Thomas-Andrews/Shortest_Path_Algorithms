@@ -1,48 +1,37 @@
-#include <iostream>
+// #include <iostream>
 #include <format>
 
 #include "test_runner.hpp"
 #include "Graph.hpp"
+#include "utils.hpp"
 
 
-
-void print_path(const std::vector<int>& prev, int start, int end) {
-    std::vector<int> path;
-    for (int at = end; at != start && at != -1; at = prev[at]) {
-        path.push_back(at);
-    }
-    if (prev[end] == -1 && end != start) {
-        std::cout << "No path found from " << start << " to " << end << std::endl;
-        return;
-    }
-    path.push_back(start);
-    std::reverse(path.begin(), path.end());
-
-    std::cout << "Path: ";
-    for (int v : path) {
-        std::cout << v << " ";
-    }
-    std::cout << std::endl;
-}
 
 void run_all_tests() {
-    // Input data test
-    std::string str = "../src/data_2.txt";
-    Graph Gi = Graph(str);
-    std::cout << Gi << std::endl;
-    Vertex v0(0, -1, -7); Vertex v3(3, 4, 1);
-    auto [dist, prev] = Gi.Dijkstra(v0, v3);
-    print_path(prev, 0, 3);
+    // // Input data test
+    // std::string str = "../src/data/data_2.txt";
+    // Graph Gi = Graph(str);
+    // std::cout << Gi << std::endl;
+    // Vertex v0(0, -1, -7); Vertex v3(3, 4, 1);
+    // auto [dist, prev] = Gi.Dijkstra(v0, v3);
+    // // print_path(prev, 0, 3); // TODO: Fix linking error
 
-    // Graph G;
-    // std::string file_path;
-    // for (int i = 0; i < 11; i++) {
-    //     file_path = std::format("../src/data_{}.txt", i);
-    //     G = Graph(file_path);
-    //     Ver
-    //     auto [dist, prev] = G.Dijkstra( ,);
-    //     print_path(prev, );
-    // }
+    Graph G;
+    Vertex begin, end;
+    std::string file_path;
+    std::tuple<Vertex, Vertex> vertex_pair; 
+    int cou = 10;
+    for (int i = 0; i < 2; i++) {
+        file_path = std::format("../src/data/data_{}.txt", i);
+        G = Graph(file_path);
+        std::cout << G << std::endl;
+        vertex_pair = G.get_random_vertex_pair();
+        begin = std::get<0>(vertex_pair);
+        end = std::get<1>(vertex_pair);
+        std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
+        auto [dist, prev] = G.Dijkstra(begin, end);
+        // print_path(prev, begin.val, end.val); // TOD: Fix linking error
+    }
 
     std::cout << "All tests done!." << std::endl;
 }

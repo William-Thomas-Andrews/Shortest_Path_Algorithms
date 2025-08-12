@@ -65,6 +65,10 @@ class UnionFind {
             return str;
         }
 
+        int get_size() {
+            return union_data.size();
+        }
+
         bool is_empty() {
             return empty;
         }

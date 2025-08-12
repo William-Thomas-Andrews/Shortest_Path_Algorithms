@@ -1,5 +1,3 @@
-
-
 cmake_minimum_required(VERSION 4.1.0)
 
 project(SPG)
@@ -19,7 +17,7 @@ add_executable(
 add_subdirectory(external/folly/)
 
 target_include_directories(SPG
-    PUBLIC ${CMAKE_SOURCE_DIR}/src  
+    PUBLIC ${CMAKE_SOURCE_DIR}/src
 )
 
 target_link_libraries( SPG
