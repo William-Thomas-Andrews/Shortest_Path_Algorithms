@@ -29,6 +29,7 @@ out/
 *.app
 
 # ---- Folly & CMake ----
+build/
 build/build/folly/
 CMakeFiles/
 CMakeCache.txt
