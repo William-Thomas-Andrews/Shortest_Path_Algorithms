@@ -9,21 +9,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# find_package(Folly CONFIG REQUIRED)
+# find_package(Folly CONFIG REQUIRED) # Enable for access without relying on the folly the submodule
 find_package(gflags CONFIG REQUIRED)
 
-
-# The path to the C++ file should be relative to where this CMakeLists.txt file is
 add_executable(
- SPG test/test.cpp
+ SPG test/Test.cpp
 )
 
 add_subdirectory(build/folly/)
 
 target_include_directories(SPG
-    PUBLIC ${CMAKE_SOURCE_DIR}/src
+    PUBLIC ${CMAKE_SOURCE_DIR}/src  
 )
 
 target_link_libraries( SPG
-    PUBLIC folly
+    PUBLIC folly                    # Here, for access without relying on the submodule, instead of <folly> write <Folly::folly>
 )

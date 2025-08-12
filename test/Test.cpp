@@ -61,7 +61,8 @@ int main() {
     }
 
     // Input data test
-    Graph Gi = Graph("../src/data_1.txt");
+    std::string str = "../src/data_1.txt";
+    Graph Gi = Graph(str);
     std::cout << Gi << std::endl;
 
 

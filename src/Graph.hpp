@@ -2,10 +2,11 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <filesystem>
+
 #include "folly/dynamic.h"
 #include "folly/json.h"
 #include "UnionFind.hpp"
-// #include "Compare.hpp"
 
 
 
@@ -142,6 +143,7 @@ class Graph {
         }
 
         folly::dynamic parse_json(std::string file_path) {
+            std::cout << std::filesystem::current_path() << std::endl;
             std::string output = "";
             std::ifstream file(file_path);
             std::string line;
