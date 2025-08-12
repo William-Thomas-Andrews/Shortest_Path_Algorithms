@@ -16,7 +16,7 @@ add_executable(
  SPG test/Test.cpp
 )
 
-add_subdirectory(build/folly/)
+add_subdirectory(external/folly/)
 
 target_include_directories(SPG
     PUBLIC ${CMAKE_SOURCE_DIR}/src  
