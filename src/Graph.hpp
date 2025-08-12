@@ -11,6 +11,8 @@
 
 
 
+
+
 // using Vertex = unsigned long;
 using Weight = signed long;
 using Coordinate = signed long;
@@ -162,6 +164,7 @@ class Graph {
         }
 
         std::tuple<Vertex, Vertex> get_random_vertex_pair() {
+            srand(time(nullptr));
             if (stored_vertices.size() < 2) {
                 throw std::runtime_error("Not enough vertices to form a pair.");
             }

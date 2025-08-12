@@ -1,12 +1,9 @@
 {
   "vertices": [
     {"id":0,"x":0,"y":0},
-    {"id":1,"x":1,"y":1},
-    {"id":2,"x":2,"y":2}
+    {"id":1,"x":1,"y":1}
   ],
   "edges": [
-    {"from":0,"to":1,"weight":5},
-    {"from":1,"to":2,"weight":3},
-    {"from":0,"to":2,"weight":10}
+    {"from":0,"to":1,"weight":37}
   ]
 }
