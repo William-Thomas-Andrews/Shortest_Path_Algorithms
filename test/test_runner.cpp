@@ -1,10 +1,8 @@
-// #include <iostream>
 #include <format>
-
 #include "test_runner.hpp"
 #include "Graph.hpp"
 #include "utils.cpp"
-
+// #include "ShowSolutionGraph.cpp"
 
 
 void run_all_tests() {
@@ -12,7 +10,10 @@ void run_all_tests() {
     Vertex begin, end;
     std::string file_path;
     std::tuple<Vertex, Vertex> vertex_pair; 
-    for (int i = 0; i < 10; i++) {
+    std::tuple<std::vector<double>, std::vector<int>>tup;
+    std::vector<double> dist = std::get<0>(tup);
+    std::vector<int> prev = std::get<1>(tup);
+    for (int i = 0; i < 2; i++) {
         file_path = std::format("../src/data/set/data_{}.txt", i);
         G = Graph(file_path);
         std::cout << G << std::endl;
@@ -21,7 +22,9 @@ void run_all_tests() {
         end = std::get<1>(vertex_pair);
         std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
         auto [dist, prev] = G.Dijkstra(begin, end);
-        print_path(prev, begin.val, end.val); // TOD: Fix linking error
+        print_path(prev, begin.val, end.val);
+        G.show_solution(prev, begin.val, end.val);
     }
+    
     std::cout << "All tests done!." << std::endl;
 }

@@ -1,0 +1,9 @@
+graph G {
+	graph [pad="0.212,0.055" bgcolor=lightgray]
+	4 [fillcolor="#d62728" pos="300,-300"]
+	0 [fillcolor="#d62728" pos="-100,-700"]
+	4 -- 0
+	1 [fillcolor="#d62728" pos="-300,-200"]
+	0 [fillcolor="#d62728" pos="-100,-700"]
+	1 -- 0
+}

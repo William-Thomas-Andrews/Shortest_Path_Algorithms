@@ -115,6 +115,8 @@ class Graph {
         std::vector<std::vector<Edge>> adj;
         std::vector<Vertex> stored_vertices;
         UnionFind union_vertices;
+        std::vector<Edge> solution_edges;
+
     public:
         Graph() {}
         Graph(int size) : union_set(UnionFind(size)), adj(size) {}
@@ -152,6 +154,7 @@ class Graph {
                 weight = edge["weight"].asInt();
                 this->add_element(Edge(v1, v2, weight));
             }
+            // GenerateGraph();
         }
 
         folly::dynamic parse_json(std::string file_path) {
@@ -178,6 +181,10 @@ class Graph {
             // std::cout << rand() % stored_vertices.size() << std::endl;
             return {v1, v2};
         }
+
+        std::vector<Edge> get_solution_edges() { return solution_edges; }
+
+        void clear_solution() { solution_edges.clear(); }
 
         // // Matroid functions begin --------------------------------------------------------------------------------------------------
         // void min_sort() {
@@ -212,6 +219,24 @@ class Graph {
             union_set.union_operation(e.get_left().val, e.get_right().val);
             adj[e.get_left().val].push_back(e);
             adj[e.get_right().val].push_back(e);
+        }
+
+        void show_solution(std::vector<int> prev, int begin, int end) {
+            for (auto edge : solution_edges) {
+                // place_edge();
+            }
+            std::ofstream graph_viz_file;
+            std::string line, str;
+            graph_viz_file.open("../src/g.gv");
+            graph_viz_file << "graph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]" << std::endl;
+            Vertex v1, v2;
+            for (Edge edge : solution_edges) {
+                v1 = edge.get_left(); v2 = edge.get_right();
+                graph_viz_file << "\t" << v1.val << " [fillcolor=\"#d62728\" " << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+                graph_viz_file << "\t" << v2.val << " [fillcolor=\"#d62728\" " << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+                graph_viz_file << "\t" << v1.val << " -- " << v2.val << std::endl;
+            }
+            graph_viz_file << "}";
         }
 
         // void pop() {
@@ -249,20 +274,14 @@ class Graph {
         }
 
         void reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
-            // int heuristic = potential(edge.get_other(subject), end) - potential(subject, end);
-            // int heuristic = potential(subject, end) - potential(edge.get_other(subject), end);
-            int heuristic = potential(leading_vertex, end); //+ potential(edge.get_other(leading_vertex), end);
+            int heuristic = potential(leading_vertex, end);
             std::cout << "-Potential: " << potential(edge.get_other(leading_vertex), end) << ". Potential: " << potential(leading_vertex, end) << ". Diff: " << heuristic << std::endl;
-            // edge.set_weight(edge.get_weight() + potential(edge.get_other(subject), end) - potential(subject, end)); // first
-            // edge.set_weight(edge.get_weight() + potential(subject, end) - potential(edge.get_other(subject), end));
-            // edge.set_weight(edge.get_weight() - potential(edge.get_other(subject), end) +  potential(subject, end));
             edge.set_weight(edge.get_weight() + heuristic);
         }
         
         std::tuple<std::vector<double>, std::vector<int>> Dijkstra(Vertex v, Vertex end) {
 
 
-            // Fix random number generation
             // TODO: Construct lots of examples to test this heuristic and new data loading format. Add a visualization. Keep testing, compare to Dijkstra's normal.
             // TODO: Separate the Vertex and Edge class files into more files.
             // TODO: Make it make decisions sequentially in the visualization (add a wait time after each move).
@@ -336,8 +355,12 @@ class Graph {
                     }
                 }
                 // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
-                if (pq.empty()) { return std::tuple(dist, prev); }
+                if (pq.empty()) { 
+                    // show_solution();
+                    return std::tuple(dist, prev); 
+                }
                 Edge best = pq.top(); pq.pop();
+                solution_edges.push_back(best);
                 std::cout << "=======We chose the best: " << best << std::endl;
                 Vertex first_vertex, second_vertex, old_vertex, new_vertex;
                 first_vertex = best.get_left(); second_vertex = best.get_right();

@@ -1,4 +1,5 @@
-// using Vertex = unsigned long;
+#pragma once
+
 
 class UnionFind {
     private:
