@@ -1,1 +1,3 @@
-int main() {}
+#pragma once
+
+void data_gen();
