@@ -56,7 +56,7 @@ class Edge {
 
     public:
         Edge() {}
-        Edge(Vertex v1, Vertex v2, Weight w) : v(v1 > v2 ? v1 : v2), u(v1 > v2 ? v2 : v1), weight(w) {}
+        Edge(Vertex v1, Vertex v2, Weight w) : v(v1), u(v2), weight(w) {}
 
         std::string get_string() {
             std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
@@ -153,7 +153,9 @@ class Graph {
                 if (!in(v2.val, stored_vertices)) { stored_vertices.push_back(v2); }
                 weight = edge["weight"].asInt();
                 this->add_element(Edge(v1, v2, weight));
+                std::cout << v1.val << " " << v2.val << std::endl; 
             }
+
             // GenerateGraph();
         }
 
@@ -225,16 +227,21 @@ class Graph {
             std::ofstream graph_viz_file;
             std::string line, str;
             graph_viz_file.open("../src/g.gv");
-            graph_viz_file << "graph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]" << std::endl ;
+            graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
             Vertex v1, v2;
             for (Edge edge : edges) {
                 v1 = edge.get_left(); v2 = edge.get_right();
                 std::string v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
                 if (v1.val == begin) v1_label = "Start";   if (v2.val == begin) v2_label = "Start";
                 else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
-                graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : "")) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
-                graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : "")) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
-                graph_viz_file << "\t" << v1.val << " -- " << v2.val << std::format(" [dir=none color=\"{}\"]", (is_solution_edge(edge) ? "red" : "black")) << std::endl;
+                std::string color = "black";
+                if (is_solution_edge(edge)) { color = "red"; }
+                std::string v1_shade_str = "", v2_shade_str ="";
+                if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
+                if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
+                graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+                graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+                graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"]", color) << std::endl;
             }
             std::cout << solution_edges.size();
 
@@ -329,8 +336,8 @@ class Graph {
                 for (Vertex pivot_vertex : pivot_vertices) {
                     // Iterate through options per pivot vertex
                     for (auto edge : adj[pivot_vertex.val]) {
-                        // If adding the pivot vertex would not form a cycle (if the edge would not connect the same partition)
-                        if (union_set.find_operation(pivot_vertex.val) != union_set.find_operation(edge.get_other(pivot_vertex).val)) {
+                        // If this edge is not directed towards the pivot and adding the pivot vertex would not form a cycle (if the edge would not connect the same partition)
+                        if (edge.get_right() != pivot_vertex and union_set.find_operation(pivot_vertex.val) != union_set.find_operation(edge.get_other(pivot_vertex).val)) {
                             // If the distance can be improved
                             if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) {
                                 // Then update the dist vector with new dist

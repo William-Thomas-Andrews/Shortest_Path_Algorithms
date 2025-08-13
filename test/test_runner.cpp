@@ -13,7 +13,7 @@ void run_all_tests() {
     std::tuple<std::vector<double>, std::vector<int>>tup;
     std::vector<double> dist = std::get<0>(tup);
     std::vector<int> prev = std::get<1>(tup);
-    for (int i = 0; i < 2; i++) {
+    for (int i = 9; i < 10; i++) {
         file_path = std::format("../src/data/data_set/data_{}.txt", i);
         G = Graph(file_path);
         std::cout << G << std::endl;
