@@ -223,20 +223,20 @@ class Graph {
             adj[e.get_right().val].push_back(e);
         }
 
-        void show_solution(std::vector<int> prev, int begin, int end) {
+        void show_solution(const std::vector<int>& prev, int begin, int end) {
             std::ofstream graph_viz_file;
-            std::string line, str;
-            graph_viz_file.open("../src/g.gv");
+            std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
+            graph_viz_file.open("../img_gen/g.gv");
             graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
             Vertex v1, v2;
             for (Edge edge : edges) {
                 v1 = edge.get_left(); v2 = edge.get_right();
-                std::string v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
+                v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
                 if (v1.val == begin) v1_label = "Start";   if (v2.val == begin) v2_label = "Start";
                 else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
-                std::string color = "black";
+                color = "black";
                 if (is_solution_edge(edge)) { color = "red"; }
-                std::string v1_shade_str = "", v2_shade_str ="";
+                v1_shade_str = "", v2_shade_str ="";
                 if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
                 if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
                 graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
@@ -244,10 +244,33 @@ class Graph {
                 graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
             }
             std::cout << solution_edges.size();
-
-            
             graph_viz_file << "}";
         }
+
+        void plot_path(const std::vector<int>& prev, int begin, int end) {
+            std::ofstream graph_viz_file;
+            std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
+            graph_viz_file.open("../img_gen/g2.gv");
+            graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
+            Vertex v1, v2;
+            for (Edge edge : edges) {
+                v1 = edge.get_left(); v2 = edge.get_right();
+                // if ()
+                v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
+                if (v1.val == begin) v1_label = "Start";   if (v2.val == begin) v2_label = "Start";
+                else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
+                color = "black";
+                if (is_solution_edge(edge)) { color = "red"; }
+                v1_shade_str = "", v2_shade_str ="";
+                if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
+                if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
+                graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+                graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+                graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
+            }
+            std::cout << solution_edges.size();
+            graph_viz_file << "}";
+        } 
 
         bool is_solution_edge(Edge edge) {
             for (Edge e : solution_edges) {

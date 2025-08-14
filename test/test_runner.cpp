@@ -33,8 +33,11 @@ void run_all_tests() {
     tup = G.Dijkstra(begin, end);
     std::vector<double> dist = std::get<0>(tup);
     std::vector<int> prev = std::get<1>(tup);
-    print_path(prev, begin.val, end.val);
+    std::vector<int> path = get_and_print_path(prev, begin.val, end.val);
     G.show_solution(prev, begin.val, end.val);
-    
+
     std::cout << "All tests done!." << std::endl;
+    for (auto x : path) {
+        std::cout << x << std::endl;
+    }
 }
