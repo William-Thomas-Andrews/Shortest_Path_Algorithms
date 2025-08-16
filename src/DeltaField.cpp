@@ -7,7 +7,7 @@ class DeltaField {
 
     public:
         DeltaField(Graph Graph_Input) : G(Graph_Input) {
-
+            
         }
 
         int activate_A_star() {

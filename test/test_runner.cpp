@@ -1,8 +1,7 @@
 #include <format>
 #include "test_runner.hpp"
-#include "Graph.hpp"
+#include "Graph.cpp"
 #include "utils.cpp"
-// #include "ShowSolutionGraph.cpp"
 
 
 void run_all_tests() {
@@ -30,7 +29,7 @@ void run_all_tests() {
     begin = std::get<0>(vertex_pair);
     end = std::get<1>(vertex_pair);
     std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
-    tup = G.Dijkstra(begin, end);
+    tup = G.A_Star(begin, end);
     std::vector<double> dist = std::get<0>(tup);
     std::vector<int> prev = std::get<1>(tup);
     std::vector<int> path = get_and_print_path(prev, begin.val, end.val);

@@ -1,0 +1,76 @@
+#include <vector>
+#include <iostream>
+#include "UnionFind.hpp"
+
+UnionFind::UnionFind() : empty(true) {}
+UnionFind::UnionFind(int size) : union_data(size, -1), empty(false ? size <= 0 : true) {}
+        
+void UnionFind::union_operation(int v, int u) {
+    if (empty) {
+       empty = false;
+    }
+    if (v >= union_data.size()) {
+        while (union_data.size() <= v) {
+            union_data.push_back(-1);
+            }
+        }
+    if (u >= union_data.size()) {
+        while (union_data.size() <= u) {
+            union_data.push_back(-1);
+        }
+    }
+    int v_index = find_operation(v);
+    int u_index = find_operation(u);
+    if (v_index == u_index) return;
+    if (union_data[v_index] < union_data[u_index]) {
+        union_data[v_index] += union_data[u_index];
+        union_data[u_index] = v_index;
+    }
+    if (union_data[v_index] >= union_data[u_index]) {
+        union_data[u_index] += union_data[v_index];
+        union_data[v_index] = u_index;
+    }
+}
+
+int UnionFind::find_operation(int v) {
+    if (v >= union_data.size()) {
+        while (union_data.size() <= v) {
+            union_data.push_back(-1);
+        }
+    }
+    if (union_data[v] < 0) {
+        return v;
+    }
+    else {
+        return union_data[v] = find_operation(union_data[v]);
+    }
+}
+
+void UnionFind::print_data() {
+    for (int i = 0; i < union_data.size(); i++) {
+        std::cout << "(" << i << ", " << union_data[i] << ") ";
+    }
+    std::cout << std::endl;
+}
+
+std::string UnionFind::get_string() {
+    std::string str = "";
+    std::cout << union_data.size() << std::endl;
+    for (int i = 0; i < union_data.size(); i++) {
+        str += "(" + std::to_string(i) + ", " + std::to_string(union_data[i]) + ") ";
+    }
+    return str;
+}
+
+int UnionFind::get_size() {
+    return union_data.size();
+}
+
+bool UnionFind::is_empty() {
+    return empty;
+}
+
+std::ostream& operator<<(std::ostream& os, UnionFind union_set) {
+    os << union_set.get_string();
+    return os;
+}
