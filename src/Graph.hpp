@@ -15,6 +15,7 @@ class Graph {
         std::vector<Vertex> stored_vertices;
         UnionFind union_vertices;
         std::vector<Edge> solution_edges;
+        std::vector<Vertex> total_vertices;
 
     public:
         Graph();
@@ -33,6 +34,8 @@ class Graph {
 
         void show_solution(const std::vector<int>& prev, int begin, int end);
 
+        void write_solution(const std::vector<int>& prev, int begin, int end);
+
         void plot_path(const std::vector<int>& prev, int begin, int end);
 
         bool is_solution_edge(Edge edge);
@@ -44,6 +47,8 @@ class Graph {
         std::string get_string();
 
         bool in (int val, std::vector<Vertex> vertices);
+
+        Vertex get_vertex(int index);
 
         signed long potential(Vertex start, Vertex end);
 
