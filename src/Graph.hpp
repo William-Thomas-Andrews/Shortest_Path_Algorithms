@@ -1,12 +1,5 @@
 #pragma once
 
-// #include <iostream>
-// #include <fstream>
-// #include <vector>
-// #include <algorithm>
-// #include <queue>
-// #include <filesystem>
-
 #include "folly/dynamic.h"
 #include "folly/json.h"
 #include "UnionFind.cpp"
@@ -58,7 +51,6 @@ class Graph {
         
         std::tuple<std::vector<double>, std::vector<int>> A_Star(Vertex v, Vertex end);
         
-    
         friend std::ostream& operator<<(std::ostream& os, Graph& G);
 };
 

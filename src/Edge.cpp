@@ -1,9 +1,5 @@
 #include "Edge.hpp"
 
-// Corresponds to the Edge type for Graphic Matroids
-// Vertex v;
-// Vertex u;
-// Weight weight;
 
 Edge::Edge() {}
 Edge::Edge(Vertex v1, Vertex v2, Weight w) {
@@ -16,10 +12,6 @@ std::string Edge::get_string() {
     std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
     return str;
 }
-// const std::string Edge::get_string() const {
-//     std::string str = "(" + std::to_string(v.val) + " - " + std::to_string(u.val) + ")" + "(" + std::to_string(weight) + ")";
-    // return str;
-// }
 
 Vertex Edge::get_left() { return v; }
 Vertex Edge::get_right() { return u; }
@@ -52,7 +44,3 @@ std::ostream& operator<<(std::ostream& os, Edge& e) {
     os << e.get_string();
     return os;
 }
-// std::ostream& operator<<(std::ostream& os, const Edge& e) {
-//     os << e.get_string();
-//     return os;
-// }
