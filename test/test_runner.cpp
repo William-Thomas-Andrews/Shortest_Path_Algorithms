@@ -44,5 +44,6 @@ void run_all_tests() {
 
     DeltaField DF(G);
 
-    DF.activate_A_star();
+    std::cout << DF.activate_A_Star() << std::endl;
+
 }

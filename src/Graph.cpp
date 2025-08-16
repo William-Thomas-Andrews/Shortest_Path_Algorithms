@@ -106,6 +106,37 @@ void Graph::show_solution(const std::vector<int>& prev, int begin, int end) {
     system("neato -n2 -Tpng ../img_gen/g.gv -o ../img_gen/file1.png ; open ../img_gen/file1.png");
 }
 
+void Graph::show_solution(const std::vector<int>& prev, int begin, int end, int iteration) {
+    system(std::format("rm ../img_gen/g{}.gv ; rm ../img_gen/file{}.png", iteration, iteration).c_str());
+    std::ofstream graph_viz_file;
+    std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
+    graph_viz_file.open(std::format("../img_gen/g{}.gv", iteration));
+    graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
+    Vertex v1, v2;
+    for (Edge edge : edges) {
+        v1 = edge.get_left(); v2 = edge.get_right();
+        v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
+        if (v1.val == begin) v1_label = "Cur.";   if (v2.val == begin) v2_label = "Cur.";
+        else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
+        color = "black";
+        if (is_solution_edge(edge)) { color = "red"; }
+        v1_shade_str = "", v2_shade_str ="";
+        if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
+        if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
+        graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+        graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+        graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
+    }
+    std::cout << solution_edges.size();
+    graph_viz_file << "}";
+    graph_viz_file.close();
+
+    solution_edges.clear();
+
+    // system(std::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
+    system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
+}
+
 void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
@@ -162,6 +193,15 @@ bool Graph::is_solution_edge(Edge edge) {
     return false;
 }
 
+Edge Graph::find_edge(Vertex v1, Vertex v2) {
+    for (Edge& e : adj[v1.val]) {
+        if (e.get_left() == v2 or e.get_right() == v2) {
+            return e;
+        }
+    }
+    return Edge();
+}
+
 std::vector<Edge>& Graph::get_data() {
     return edges;
 }
@@ -206,13 +246,6 @@ void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
 }
 
 std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex end) {
-
-
-    // TODO: Construct lots of examples to test this heuristic and new data loading format. Add a visualization. Keep testing, compare to Dijkstra's normal.
-    // TODO: Make it make decisions sequentially in the visualization (add a wait time after each move).
-    // Once done, study and add the neural network.
-    // Try to make it live and changing.
-    // If possible, try to integrate this into osm stuff.
 
 
     double inf = 1.0/ 0.0; 

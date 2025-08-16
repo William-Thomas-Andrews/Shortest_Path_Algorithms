@@ -2,20 +2,18 @@
 #include <chrono>   
 
 #include "DeltaField.hpp"
-// #include "Graph.hpp"
-// #include "utils.cpp"
-#include "../test/utils.cpp"
+#include "../test/utils.cpp" 
 
 
 DeltaField::DeltaField(Graph Graph_Input) : G(Graph_Input) {
 
 }
 
-int DeltaField::activate_A_star() {
+int DeltaField::activate_A_Star() {
 
     int total = 0;
 
-    Vertex begin, end;
+    Vertex begin, end, step;
     std::string file_path;
     std::tuple<Vertex, Vertex> vertex_pair; 
     std::tuple<std::vector<double>, std::vector<int>> tup;
@@ -28,25 +26,37 @@ int DeltaField::activate_A_star() {
     begin = std::get<0>(vertex_pair);
     end = std::get<1>(vertex_pair);
 
+    int i = 0;
+
+    system("killall Preview ; rm -rf ../img_gen/* ");
 
     while (begin != end) {
         std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
         tup = G.A_Star(begin, end);
+        
         dist = std::get<0>(tup);
         prev = std::get<1>(tup);
         path = get_and_print_path(prev, begin.val, end.val);
-        G.show_solution(prev, begin.val, end.val); 
-        begin = G.get_vertex(path[1]);  // Take a step forward
-        std::cout << "Step to: " << path[1] << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        G.show_solution(prev, begin.val, end.val, i); 
+        step = G.get_vertex(path[1]);
+        total += G.find_edge(begin, step).get_weight();
+        begin = step;  // Take a step forward
+        std::cout << "Step to: " << step.val << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        i++;
+        // change_weights(); // Adds some random traffic complications
     }
-    // return
-    // TODO: CREATE totals, and multiple frame iterations - auto, not manual
+    
     // TODO: Add more to the map. Then add random effects to some roads to throw off the algorithm.
+    // TODO: Fix ../test/utils file path stuff. Make it cleaner.
+    // TODO: Simplify Everything and make it cleaner and more efficient.
+    // TODO: Implement Neural Network
 
     std::cout << "Done with the Delta Field!" << std::endl;
 
-    G.show_solution(prev, begin.val, end.val);
+    G.show_solution(prev, begin.val, end.val, i);
+
+    return total;
 
 }
 

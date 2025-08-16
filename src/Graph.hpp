@@ -34,11 +34,15 @@ class Graph {
 
         void show_solution(const std::vector<int>& prev, int begin, int end);
 
+        void show_solution(const std::vector<int>& prev, int begin, int end, int iteration);
+
         void write_solution(const std::vector<int>& prev, int begin, int end);
 
         void plot_path(const std::vector<int>& prev, int begin, int end);
 
         bool is_solution_edge(Edge edge);
+
+        Edge find_edge(Vertex v1, Vertex v2);
 
         std::vector<Edge>& get_data();
 
