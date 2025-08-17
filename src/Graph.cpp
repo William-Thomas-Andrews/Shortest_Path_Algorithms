@@ -276,6 +276,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
 
     // Iterate through number of 'turns'
     for (int i = 0; i < adj.size()-1; i++) {
+        std::cout << "Da size: " << adj.size() - 1 << std::endl;
         // Iterate through pivot (used) vertices
         for (Vertex pivot_vertex : pivot_vertices) {
             // Iterate through options per pivot vertex
@@ -319,6 +320,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
         // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
         if (pq.empty()) { 
             // show_solution();
+            std::cout << "Adj size: " << adj.size() << std::endl;
             return std::tuple(dist, prev); 
         }
         Edge best = pq.top(); pq.pop();
@@ -376,7 +378,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
         // And if vertex not found, pop the rest of the edges out
         while (!pq.empty()) {
             pq.pop();
-            if (pq.size() > 10) return std::tuple(dist, prev);
+            if (pq.size() > adj.size()) return std::tuple(dist, prev);
         }
         // and repeat~
     }
