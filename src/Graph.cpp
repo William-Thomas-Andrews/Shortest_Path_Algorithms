@@ -146,7 +146,7 @@ void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
     for (Edge edge : edges) {
         v1 = edge.get_left(); v2 = edge.get_right();
         v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
-        if (v1.val == begin) v1_label = "Start";   if (v2.val == begin) v2_label = "Start";
+        if (v1.val == begin) v1_label = "Cur.";   if (v2.val == begin) v2_label = "Cur.";
         else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
         color = "black";
         if (is_solution_edge(edge)) { color = "red"; }
@@ -159,18 +159,19 @@ void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
     }
     std::cout << solution_edges.size();
     graph_viz_file << "}";
+    graph_viz_file.close();
 }
 
 void Graph::plot_path(const std::vector<int>& prev, int begin, int end) {
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
-    graph_viz_file.open("../img_gen/g2.gv");
+    graph_viz_file.open("../img_gen/g.gv");
     graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
     Vertex v1, v2;
     for (Edge edge : edges) {
         v1 = edge.get_left(); v2 = edge.get_right();
         v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
-        if (v1.val == begin) v1_label = "Start";   if (v2.val == begin) v2_label = "Start";
+        if (v1.val == begin) v1_label = "Cur.";   if (v2.val == begin) v2_label = "Cur.";
         else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
         color = "black";
         if (is_solution_edge(edge)) { color = "red"; }
@@ -183,6 +184,9 @@ void Graph::plot_path(const std::vector<int>& prev, int begin, int end) {
     }
     std::cout << solution_edges.size();
     graph_viz_file << "}";
+    graph_viz_file.close();
+
+    system(" neato -n2 -Tpng ../img_gen/g.gv -o ../img_gen/file.png");
 } 
 
 bool Graph::is_solution_edge(Edge edge) {
@@ -236,7 +240,7 @@ Vertex Graph::get_vertex(int index) {
 }
 
 signed long Graph::potential(Vertex start, Vertex end) {
-    return std::sqrt( std::pow((start.x - end.x), 2) + std::pow((start.y - end.y), 2) );
+    return std::sqrt( std::sqrt( std::pow((start.x - end.x), 2) + std::pow((start.y - end.y), 2) ) );
 }
 
 void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
