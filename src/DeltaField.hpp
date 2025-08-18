@@ -5,6 +5,7 @@
 class DeltaField {
     private:
         Graph G;
+        GNN Neural_Network;
 
     public:
         DeltaField(Graph Graph_Input);

@@ -56,5 +56,5 @@ int DeltaField::activate_A_Star() {
 }
 
 int DeltaField::activate_neural_network() {
-
+    Neural_Network.train();
 }

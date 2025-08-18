@@ -29,27 +29,29 @@ void run_all_tests() {
     //     print_path(prev, begin.val, end.val);
     //     G.show_solution(prev, begin.val, end.val);
     // }
-    file_path = "../src/data/data_set/data_london.txt";
-    G = Graph(file_path);
-    std::cout << G << std::endl;
+    // file_path = "../src/data/data_set/data_london.txt";
+    // G = Graph(file_path);
+    // std::cout << G << std::endl;
 
-    vertex_pair = G.get_random_vertex_pair();
-    begin = std::get<0>(vertex_pair);
-    end = std::get<1>(vertex_pair);
-    std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
-    tup = G.A_Star(begin, end);
-    std::vector<double> dist = std::get<0>(tup);
-    std::vector<int> prev = std::get<1>(tup);
-    std::vector<int> path = get_and_print_path(prev, begin.val, end.val);
-    G.plot_path(prev, begin.val, end.val);
+    // vertex_pair = G.get_random_vertex_pair();
+    // begin = std::get<0>(vertex_pair);
+    // end = std::get<1>(vertex_pair);
+    // std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
+    // tup = G.A_Star(begin, end);
+    // std::vector<double> dist = std::get<0>(tup);
+    // std::vector<int> prev = std::get<1>(tup);
+    // std::vector<int> path = get_and_print_path(prev, begin.val, end.val);
+    // G.plot_path(prev, begin.val, end.val);
 
-    std::cout << "All tests done!." << std::endl;
-    for (auto x : path) {
-        std::cout << x << std::endl;
-    }
+    // std::cout << "All tests done!." << std::endl;
+    // for (auto x : path) {
+    //     std::cout << x << std::endl;
+    // }
 
-    // DeltaField DF(G);
+    DeltaField DF(G);
 
     // std::cout << DF.activate_A_Star() << std::endl;
+
+    DF.activate_neural_network();
 
 }
