@@ -1,9 +1,6 @@
 #include <format>
-#include "test_runner.hpp"
-// #include "Graph.cpp"
-// #include "utils.cpp"
+#include "TestRunner.hpp"
 #include "DeltaField.cpp"
-// #include "GNN.cpp"
 
 
 void run_all_tests() {

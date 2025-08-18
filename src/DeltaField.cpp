@@ -3,7 +3,7 @@
 
 #include "DeltaField.hpp"
 // #include "../test/utils.cpp"
-#include "utils.cpp" 
+#include "Utils.cpp" 
 
 
 DeltaField::DeltaField(Graph Graph_Input) : G(Graph_Input) {}
@@ -58,4 +58,5 @@ int DeltaField::activate_A_Star() {
 
 int DeltaField::activate_neural_network() {
     Neural_Network.train();
+    return 0;
 }

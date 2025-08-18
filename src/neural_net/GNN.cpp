@@ -40,6 +40,7 @@ Matrix GNN::softmax(Matrix& M) {
     }
     double sum = return_matrix.sum_elements();
     return_matrix = return_matrix / sum;
+    return return_matrix;
 }
 
 void GNN::forward_prop() {
@@ -110,5 +111,5 @@ std::vector<Edge> GNN::predict(Vertex start, Vertex end) {
     // Perform forward prop from above
 
     // Return prediction vector (or other way of showing the path taken);
-
+    return std::vector<Edge>();
 }

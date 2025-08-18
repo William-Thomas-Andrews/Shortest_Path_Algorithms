@@ -19,6 +19,7 @@ Weight Edge::get_weight() { return weight; }
 Vertex Edge::get_other(Vertex v) { 
     if (this->get_left().val == v.val) { return this->get_right(); }
     if (this->get_right().val == v.val) { return this->get_left(); }
+    else { return Vertex(); }
 }
 void Edge::set_weight(Weight w) { weight = w; }
 
