@@ -18,6 +18,10 @@ add_subdirectory(external/folly/)
 
 target_include_directories(SPG
     PUBLIC ${CMAKE_SOURCE_DIR}/src
+    PUBLIC ${CMAKE_SOURCE_DIR}/src/utils
+    PUBLIC ${CMAKE_SOURCE_DIR}/src/graph
+    PUBLIC ${CMAKE_SOURCE_DIR}/src/neural_net
+    PUBLIC ${CMAKE_SOURCE_DIR}/src/data
 )
 
 target_link_libraries( SPG

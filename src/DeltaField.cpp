@@ -2,7 +2,8 @@
 #include <chrono>   
 
 #include "DeltaField.hpp"
-#include "../test/utils.cpp" 
+// #include "../test/utils.cpp"
+#include "utils.cpp" 
 
 
 DeltaField::DeltaField(Graph Graph_Input) : G(Graph_Input) {}
