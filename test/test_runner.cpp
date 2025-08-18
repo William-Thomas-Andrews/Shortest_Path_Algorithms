@@ -3,9 +3,15 @@
 // #include "Graph.cpp"
 // #include "utils.cpp"
 #include "DeltaField.cpp"
+// #include "GNN.cpp"
 
 
 void run_all_tests() {
+
+    // TODO: Fix ../test/utils file path stuff. Make it cleaner.
+    // TODO: Simplify Everything and make it cleaner and more efficient.
+    // TODO: Implement the Graph Neural Network
+
     Graph G;
     Vertex begin, end;
     std::string file_path;

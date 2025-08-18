@@ -5,9 +5,7 @@
 #include "../test/utils.cpp" 
 
 
-DeltaField::DeltaField(Graph Graph_Input) : G(Graph_Input) {
-
-}
+DeltaField::DeltaField(Graph Graph_Input) : G(Graph_Input) {}
 
 int DeltaField::activate_A_Star() {
 
@@ -47,10 +45,7 @@ int DeltaField::activate_A_Star() {
         // change_weights(); // Adds some random traffic complications
     }
     
-    // TODO: Add more to the map. Then add random effects to some roads to throw off the algorithm.
-    // TODO: Fix ../test/utils file path stuff. Make it cleaner.
-    // TODO: Simplify Everything and make it cleaner and more efficient.
-    // TODO: Implement Neural Network
+    
 
     std::cout << "Done with the Delta Field!" << std::endl;
 
