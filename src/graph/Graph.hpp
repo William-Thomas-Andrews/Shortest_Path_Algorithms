@@ -22,6 +22,8 @@ class Graph {
         Graph(int size);
         Graph(std::string file_path);
 
+        void operator=(const Graph& other);
+
         folly::dynamic parse_json(std::string file_path);
 
         std::tuple<Vertex, Vertex> get_random_vertex_pair();
@@ -53,6 +55,8 @@ class Graph {
         bool in (int val, std::vector<Vertex> vertices);
 
         Vertex get_vertex(int index);
+
+        const std::vector<Vertex>& get_vertices();
 
         signed long potential(Vertex start, Vertex end);
 

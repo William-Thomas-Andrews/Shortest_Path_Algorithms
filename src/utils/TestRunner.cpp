@@ -5,9 +5,10 @@
 
 void run_all_tests() {
 
-    // TODO: Fix ../test/utils file path stuff. Make it cleaner.
-    // TODO: Simplify Everything and make it cleaner and more efficient.
-    // TODO: Implement the Graph Neural Network
+    // TODO: Simplify Everything and make it cleaner and more efficient. Simplify the mess in the Graph class lol
+    // TODO: Fix Neural Network vertex input (probably change Graph class vertex storage)
+    // TODO: Implement and connect the rest of neural network logic flow for 1 training example
+    // TODO: Scale up to multiple training examples and multiple iterations
 
     Graph G;
     Vertex begin, end;
@@ -26,8 +27,8 @@ void run_all_tests() {
     //     print_path(prev, begin.val, end.val);
     //     G.show_solution(prev, begin.val, end.val);
     // }
-    // file_path = "../src/data/data_set/data_london.txt";
-    // G = Graph(file_path);
+    file_path = "../src/data/data_set/data_london.txt";
+    G = Graph(file_path);
     // std::cout << G << std::endl;
 
     // vertex_pair = G.get_random_vertex_pair();

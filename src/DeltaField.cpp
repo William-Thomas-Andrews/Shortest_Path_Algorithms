@@ -2,7 +2,6 @@
 #include <chrono>   
 
 #include "DeltaField.hpp"
-// #include "../test/utils.cpp"
 #include "Utils.cpp" 
 
 
@@ -20,19 +19,17 @@ int DeltaField::activate_A_Star() {
     std::vector<int> prev;
     std::vector<int> path;
 
-
     vertex_pair = G.get_random_vertex_pair();
     begin = std::get<0>(vertex_pair);
     end = std::get<1>(vertex_pair);
 
     int i = 0;
 
-    system("killall Preview ; rm -rf ../img_gen/* ");
+    system("killall Preview ; rm -rf ../img_gen/* "); // The Preview process is the default pdf/image viewer app for macOS
 
     while (begin != end) {
         std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
         tup = G.A_Star(begin, end);
-        
         dist = std::get<0>(tup);
         prev = std::get<1>(tup);
         path = get_and_print_path(prev, begin.val, end.val);
@@ -43,7 +40,6 @@ int DeltaField::activate_A_Star() {
         std::cout << "Step to: " << step.val << std::endl;
         std::this_thread::sleep_for(std::chrono::seconds(2));
         i++;
-        // change_weights(); // Adds some random traffic complications
     }
     
     
@@ -57,6 +53,9 @@ int DeltaField::activate_A_Star() {
 }
 
 int DeltaField::activate_neural_network() {
+    std::cout << G << std::endl;
+    Neural_Network = GNN(G, 0.01);
+    std::cout << "hey!" << std::endl;
     Neural_Network.train();
     return 0;
 }

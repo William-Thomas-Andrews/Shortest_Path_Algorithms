@@ -4,6 +4,11 @@
 
 UnionFind::UnionFind() : empty(true) {}
 UnionFind::UnionFind(int size) : union_data(size, -1), empty(false ? size <= 0 : true) {}
+
+void UnionFind::operator=(const UnionFind& other) {
+    union_data = other.union_data;
+    empty = other.empty;
+}
         
 void UnionFind::union_operation(int v, int u) {
     if (empty) {

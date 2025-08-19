@@ -8,6 +8,8 @@ class UnionFind {
     public:
         UnionFind();
         UnionFind(int size);
+
+        void operator=(const UnionFind& other);
         
         void union_operation(int v, int u);
 

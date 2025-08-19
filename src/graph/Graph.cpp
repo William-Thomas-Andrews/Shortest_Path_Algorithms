@@ -41,6 +41,16 @@ Graph::Graph(std::string file_path) {
     // GenerateGraph();
 }
 
+void Graph::operator=(const Graph& other) {
+    edges = other.edges;
+    union_set = other.union_set;
+    adj = other.adj;
+    stored_vertices = other.stored_vertices;
+    union_vertices = other.union_vertices;
+    solution_edges = other.solution_edges;
+    total_vertices = other.total_vertices;
+}
+
 folly::dynamic Graph::parse_json(std::string file_path) {
     std::cout << std::filesystem::current_path() << std::endl;
     std::string output = "";
@@ -237,6 +247,10 @@ Vertex Graph::get_vertex(int index) {
         }
     }
     return Vertex();
+}
+
+const std::vector<Vertex>& Graph::get_vertices() {
+    return total_vertices;
 }
 
 signed long Graph::potential(Vertex start, Vertex end) {

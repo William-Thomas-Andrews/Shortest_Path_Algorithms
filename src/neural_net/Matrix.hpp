@@ -16,6 +16,7 @@ class Matrix {
         Matrix(int num_rows, int num_columns);
         Matrix(double item, int num_rows, int num_columns);
         Matrix(const std::vector<double>& data, int num_rows, int num_columns);
+        Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns);
         Matrix(double* data, int data_size, int num_rows, int num_columns);
 
         ~Matrix();
@@ -29,26 +30,32 @@ class Matrix {
         bool operator==(const Matrix& other);
         bool operator!=(const Matrix& other);
 
-        Matrix operator+(double val);
-        Matrix operator-(double val);
-        Matrix operator*(double val);
-        Matrix operator/(double val);
-
         std::vector<double> get_data() const ;
 
+        double* get_data_address();
+
         int get_size();
-        int get_rows();
-        int get_cols();
 
         std::string get_string();
 
         double get_element(int row_index, int col_index);
+        int get_rows();
+        int get_cols();
 
         double sum_elements();
 
         Matrix Transpose();
         Matrix operator()(int row_index) ;
         double& operator()(int row_index, int col_index) const ;
+
+        friend Matrix operator+(const Matrix& M, double val);
+        friend Matrix operator-(const Matrix& M, double val);
+        friend Matrix operator*(const Matrix& M, double val);
+        friend Matrix operator/(const Matrix& M, double val);
+        friend Matrix operator+(double val, const Matrix& M);
+        friend Matrix operator-(double val, const Matrix& M);
+        friend Matrix operator*(double val, const Matrix& M);
+        friend Matrix operator/(double val, const Matrix& M);
 
         friend std::ostream& operator<<(std::ostream& os, const Matrix& A);
         friend Matrix dot(const Matrix& A, const Matrix& B);

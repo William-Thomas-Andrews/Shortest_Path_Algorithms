@@ -18,6 +18,13 @@ Matrix::Matrix::Matrix(const std::vector<double>& data, int num_rows, int num_co
     for (int i = 0; i < size; i++) { matrix_array[i] = data[i]; }
 }
 
+Matrix::Matrix::Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // Vector input
+    if (data.size() != size) { throw std::invalid_argument("Size of array does not match dimension sizes."); }
+    matrix_array = (double *) malloc(size * sizeof(double));
+    for (int i = 0; i < size; i++) { matrix_array[i] = (double) (data[i]).val; }
+    std::cout << matrix_array[3] << std::endl;
+}
+
 Matrix::Matrix(double* data, int data_size, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // C-style array input
     if (data_size != size) { throw std::invalid_argument("Size of array does not match dimension sizes."); }
     matrix_array = (double *) malloc(size * sizeof(double));
@@ -69,13 +76,14 @@ Matrix Matrix::operator/(const Matrix& other) {
     return return_matrix;
 }
 
-void Matrix::operator=(const Matrix& other) { // Address assignment
+void Matrix::operator=(const Matrix& other) { // Copy assignment
     if (this == &other) { return; }
-    // for (int i = 0; i < other.size; i++) {
-    //     matrix_array[i] = other.matrix_array[i];
-    // }
-    free(matrix_array);
-    matrix_array = other.matrix_array;
+    double* new_array = (double*) malloc(other.size * sizeof(double));
+    for (int i = 0; i < other.size; i++) {
+        new_array[i] = other.matrix_array[i];
+    }
+    // free(matrix_array)
+    matrix_array = new_array;
     size = other.size;
     rows = other.rows;
     columns = other.columns;
@@ -109,39 +117,6 @@ bool Matrix::operator!=(const Matrix& other) {
     return false;
 }
 
-// Scalar Operators
-Matrix Matrix::operator+(double val) {
-    Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
-    for (int i = 0; i < size; i++) { 
-        return_matrix.matrix_array[i] += val; 
-    }
-    return return_matrix;
-}
-
-Matrix Matrix::operator-(double val) {
-    Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
-    for (int i = 0; i < size; i++) {
-        return_matrix.matrix_array[i] -= val;
-    }
-    return return_matrix;
-}
-
-Matrix Matrix::operator*(double val) {
-    Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
-    for (int i = 0; i < size; i++) {
-        return_matrix.matrix_array[i] *= val;
-    }
-    return return_matrix;
-}
-
-Matrix Matrix::operator/(double val) {
-    Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
-    for (int i = 0; i < size; i++) {
-        return_matrix.matrix_array[i] /= val;
-    }
-    return return_matrix;
-}
-
 std::vector<double> Matrix::get_data() const {
     std::vector<double> vec({});
     for (int i = 0; i < size; i++) {
@@ -150,9 +125,20 @@ std::vector<double> Matrix::get_data() const {
     return vec;
 }
 
-int Matrix::get_size() { return sizeof(matrix_array); }
-int Matrix::get_rows() { return rows; }
-int Matrix::get_cols() { return columns; }
+int Matrix::get_rows() {
+    return rows;
+}
+
+int Matrix::get_cols() {
+    return columns;
+}
+
+double* Matrix::get_data_address() {
+    return matrix_array;
+}
+
+// int Matrix::get_size() { return sizeof(matrix_array); }
+int Matrix::get_size() { return size; }
 
 std::string Matrix::get_string() { 
     std::string str = "";
@@ -246,4 +232,90 @@ Matrix dot(const Matrix& A, const Matrix& B) {
         }
     }
     return to_return;
+}
+
+
+
+
+// Extra-Class Scalar Operators
+Matrix operator+(const Matrix& M, double val) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) += val;
+        }
+    }
+    return return_matrix;
+}
+
+Matrix operator-(const Matrix& M, double val) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) -= val;
+        }
+    }
+    return return_matrix;
+}
+
+Matrix operator*(const Matrix& M, double val) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) *= val;
+        }
+    }
+    return return_matrix;
+}
+
+Matrix operator/(const Matrix& M, double val) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) /= val;
+        }
+    }
+    return return_matrix;
+}
+
+
+// Extra-Class Scalar Operators - reversed
+Matrix operator+(double val, const Matrix& M) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) += val;
+        }
+    }
+    return return_matrix;
+}
+
+Matrix operator-(double val, const Matrix& M) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) = val - return_matrix(i, j);
+        }
+    }
+    return return_matrix;
+}
+
+Matrix operator*(double val, const Matrix& M) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) *= val;
+        }
+    }
+    return return_matrix;
+}
+Matrix operator/(double val, const Matrix& M) {
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.rows);
+    std::cout << "le " << return_matrix << std::endl;
+    for (int i = 0; i < return_matrix.rows; i++) {
+        for (int j = 0; j < return_matrix.columns; j++) {
+            return_matrix(i, j) = val / return_matrix(i, j);
+        }
+    }
+    return return_matrix;
 }
