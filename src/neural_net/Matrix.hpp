@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <random>
 
 
 class Matrix {
@@ -14,6 +15,7 @@ class Matrix {
     public:
         Matrix();
         Matrix(int num_rows, int num_columns);
+        Matrix(int num_rows, int num_columns, double lower_bound, double upper_bound);
         Matrix(double item, int num_rows, int num_columns);
         Matrix(const std::vector<double>& data, int num_rows, int num_columns);
         Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns);
@@ -47,6 +49,7 @@ class Matrix {
         Matrix Transpose();
         Matrix operator()(int row_index) ;
         double& operator()(int row_index, int col_index) const ;
+        void clear();
 
         friend Matrix operator+(const Matrix& M, double val);
         friend Matrix operator-(const Matrix& M, double val);

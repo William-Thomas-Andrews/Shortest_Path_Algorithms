@@ -2,7 +2,7 @@
 #include <chrono>   
 
 #include "DeltaField.hpp"
-#include "Utils.cpp" 
+// #include "Utils.cpp" 
 
 
 DeltaField::DeltaField(Graph Graph_Input) : G(Graph_Input) {}
@@ -54,7 +54,7 @@ int DeltaField::activate_A_Star() {
 
 int DeltaField::activate_neural_network() {
     std::cout << G << std::endl;
-    Neural_Network = GNN(G, 0.01);
+    Neural_Network = GNN(G, 1);
     std::cout << "hey!" << std::endl;
     Neural_Network.train();
     return 0;

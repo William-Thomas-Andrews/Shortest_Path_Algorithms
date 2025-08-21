@@ -15,7 +15,7 @@ class Graph {
         std::vector<Vertex> stored_vertices;
         UnionFind union_vertices;
         std::vector<Edge> solution_edges;
-        std::vector<Vertex> total_vertices;
+        std::vector<Vertex> ordered_vertices;
 
     public:
         Graph();
@@ -23,6 +23,8 @@ class Graph {
         Graph(std::string file_path);
 
         void operator=(const Graph& other);
+
+        Vertex operator[](int vertex_index);
 
         folly::dynamic parse_json(std::string file_path);
 

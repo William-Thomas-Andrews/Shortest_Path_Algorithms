@@ -13,8 +13,8 @@ void data_gen(int i) {
     std::uniform_int_distribution<std::mt19937::result_type> dist_coord(0,1000);
     std::uniform_int_distribution<std::mt19937::result_type> dist_from_to;
     std::uniform_int_distribution<std::mt19937::result_type> dist_weight(1,100);
-    int max;
-    int j;
+    int max, j;
+    
     std::cout << i << std::endl;
     file.open(std::format("data_{}.txt", i));
     file << "{\n";

@@ -5,10 +5,14 @@
 
 void run_all_tests() {
 
-    // TODO: Simplify Everything and make it cleaner and more efficient. Simplify the mess in the Graph class lol
-    // TODO: Fix Neural Network vertex input (probably change Graph class vertex storage)
-    // TODO: Implement and connect the rest of neural network logic flow for 1 training example
-    // TODO: Scale up to multiple training examples and multiple iterations
+    // TODO: Simplify Everything and make it cleaner and more efficient. Simplify the mess in the Graph and DeltaField classes lol.
+    // TODO: Figure out how to set alpha globally.
+    // TODO: Change Neural Network from learning weights to learning which edges to flip on or off (use softmax) and number the edges of course
+    // in order to do this. Factor in weights somehow either individually or penalize with total weight. We are not trying to have it guess 
+    // weight, but we want it to guess what edge to use, penalizing bad edge choices that result in higher weight.
+    // TODO: Scale up to multiple training examples (batch size).
+    // TODO UnionFind pivot_union = UnionFind(adj.size());
+
 
     Graph G;
     Vertex begin, end;

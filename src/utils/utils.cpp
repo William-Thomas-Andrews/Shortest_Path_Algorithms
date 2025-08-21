@@ -23,3 +23,28 @@ std::vector<int> get_and_print_path(const std::vector<int>& prev, int start, int
     std::cout << std::endl;
     return path;
 }
+
+// std::vector<Vertex> get_and_print_path(const std::vector<Vertex>& prev, Vertex start, Vertex end) {
+//     // std::cout << "Prev: ";
+//     // for (int x : prev) {
+//     //     std::cout << x << std::endl;
+//     // }
+//     std::vector<Vertex> path;
+//     for (int at = end; at != start && at.val != -1; at = prev[at.val]) {
+//         path.push_back(at);
+//     }
+//     if (prev[end.val].val == -1 && end != start) {
+//         std::cout << "No path found from " << start << " to " << end << std::endl;
+//         return path;
+//     }
+//     path.push_back(start);
+//     std::reverse(path.begin(), path.end());
+
+//     std::cout << "Path: ";
+//     for (Vertex v : path) {
+//         std::cout << v << " ";
+//     }
+//     std::cout << std::endl;
+//     return path;
+// }
+

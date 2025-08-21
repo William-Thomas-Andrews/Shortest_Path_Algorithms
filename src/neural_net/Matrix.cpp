@@ -2,29 +2,43 @@
 
 Matrix::Matrix() {}
 
-Matrix::Matrix(int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // No item specification results in a Matrix of all 0s
+// A matrix of all 0s
+Matrix::Matrix(int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { 
     matrix_array = (double *) malloc(size * sizeof(double));
     for (int i = 0; i < size; i++) { matrix_array[i] = 0; }
 }
 
-Matrix::Matrix(double item, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // A one valued matrix
+// Uniform dist [lower_bound, upper_bound]
+Matrix::Matrix(int num_rows, int num_columns, double lower_bound, double upper_bound) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { 
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    std::uniform_real_distribution<> unif_dist(lower_bound, upper_bound);
+    matrix_array = (double *) malloc(size * sizeof(double));
+    for (int i = 0; i < size; i++) { matrix_array[i] = unif_dist(rng); }
+}
+
+// A matrix with only 1 value per entry
+Matrix::Matrix(double item, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { 
     matrix_array = (double *) malloc(size * sizeof(double));
     for (int i = 0; i < size; i++) { matrix_array[i] = item; }
 }
 
-Matrix::Matrix::Matrix(const std::vector<double>& data, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // Vector input
+// Vector input for doubles
+Matrix::Matrix::Matrix(const std::vector<double>& data, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { 
     if (data.size() != size) { throw std::invalid_argument("Size of array does not match dimension sizes."); }
     matrix_array = (double *) malloc(size * sizeof(double));
     for (int i = 0; i < size; i++) { matrix_array[i] = data[i]; }
 }
 
-Matrix::Matrix::Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // Vector input
+// Vector input for elements with type Vertex 
+Matrix::Matrix::Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { 
     if (data.size() != size) { throw std::invalid_argument("Size of array does not match dimension sizes."); }
     matrix_array = (double *) malloc(size * sizeof(double));
     for (int i = 0; i < size; i++) { matrix_array[i] = (double) (data[i]).val; }
     std::cout << matrix_array[3] << std::endl;
 }
 
+// Standard double array input input
 Matrix::Matrix(double* data, int data_size, int num_rows, int num_columns) : rows(num_rows), columns(num_columns), size(num_rows*num_columns) { // C-style array input
     if (data_size != size) { throw std::invalid_argument("Size of array does not match dimension sizes."); }
     matrix_array = (double *) malloc(size * sizeof(double));
@@ -212,6 +226,12 @@ double& Matrix::operator()(int row_index, int col_index) const {
     if (0 > col_index) { throw std::out_of_range("Column index cannot be negative"); }
 
     return matrix_array[(row_index * columns) + col_index];
+}
+
+void Matrix::clear() {
+    for (int i = 0; i < size; i++) {
+        matrix_array[i] = 0;
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, Matrix& A) {

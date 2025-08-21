@@ -34,7 +34,7 @@ Graph::Graph(std::string file_path) {
         if (!in(v2.val, stored_vertices)) { stored_vertices.push_back(v2); }
         weight = edge["weight"].asInt();
         this->add_element(Edge(v1, v2, weight));
-        total_vertices.push_back(v1); total_vertices.push_back(v2);
+        ordered_vertices.push_back(v1); ordered_vertices.push_back(v2);
         std::cout << v1.val << " " << v2.val << std::endl; 
     }
 
@@ -48,7 +48,12 @@ void Graph::operator=(const Graph& other) {
     stored_vertices = other.stored_vertices;
     union_vertices = other.union_vertices;
     solution_edges = other.solution_edges;
-    total_vertices = other.total_vertices;
+    ordered_vertices = other.ordered_vertices;
+}
+
+Vertex Graph::operator[](int vertex_index) {
+    for (Vertex v : ordered_vertices) { if (vertex_index == v.val) { return v; } }
+    return Vertex();
 }
 
 folly::dynamic Graph::parse_json(std::string file_path) {
@@ -61,7 +66,7 @@ folly::dynamic Graph::parse_json(std::string file_path) {
 }
 
 std::tuple<Vertex, Vertex> Graph::get_random_vertex_pair() {
-    srand(time(nullptr));
+    srand(static_cast<unsigned>(std::chrono::high_resolution_clock::now().time_since_epoch().count()));
     if (stored_vertices.size() < 2) {
         throw std::runtime_error("Not enough vertices to form a pair.");
     }
@@ -241,7 +246,7 @@ bool Graph::in (int val, std::vector<Vertex> vertices) {
 }
 
 Vertex Graph::get_vertex(int index) {
-    for (Vertex v : total_vertices) {
+    for (Vertex v : ordered_vertices) {
         if (v.val == index) {
             return v;
         }
@@ -250,7 +255,7 @@ Vertex Graph::get_vertex(int index) {
 }
 
 const std::vector<Vertex>& Graph::get_vertices() {
-    return total_vertices;
+    return ordered_vertices;
 }
 
 signed long Graph::potential(Vertex start, Vertex end) {
@@ -259,12 +264,13 @@ signed long Graph::potential(Vertex start, Vertex end) {
 
 void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
     int heuristic = potential(leading_vertex, end);
-    std::cout << "-Potential: " << potential(edge.get_other(leading_vertex), end) << ". Potential: " << potential(leading_vertex, end) << ". Diff: " << heuristic << std::endl;
+    // std::cout << "-Potential: " << potential(edge.get_other(leading_vertex), end) << ". Potential: " << potential(leading_vertex, end) << ". Diff: " << heuristic << std::endl;
     edge.set_weight(edge.get_weight() + heuristic);
 }
 
 std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex end) {
 
+    solution_edges.clear();
 
     double inf = 1.0/ 0.0; 
     std::vector<double> dist(adj.size(), inf);
@@ -286,11 +292,9 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
 
     // A set of used vertices
     std::vector<Vertex> pivot_vertices = {v};
-    // TODO UnionFind pivot_union = UnionFind(adj.size());
 
     // Iterate through number of 'turns'
     for (int i = 0; i < adj.size()-1; i++) {
-        std::cout << "Da size: " << adj.size() - 1 << std::endl;
         // Iterate through pivot (used) vertices
         for (Vertex pivot_vertex : pivot_vertices) {
             // Iterate through options per pivot vertex
@@ -302,14 +306,14 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
                         // Then update the dist vector with new dist
                         dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight());
                         Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), dist[edge.get_other(pivot_vertex).val]);
-                        std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
+                        // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
                         if (in(new_edge.get_left().val, pivot_vertices)) {
                             reweight(new_edge, new_edge.get_right(), end);
                         }
                         else {
                             reweight(new_edge, new_edge.get_left(), end);
                         }
-                        std::cout << "New weight: " << new_edge.get_weight() << std::endl;
+                        // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
                         // Then push it to the queue
                         pq.push(new_edge);
                     }
@@ -317,14 +321,14 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
                     else {
                         // Update dist vector with old dist + weight
                         Edge new_edge = Edge(pivot_vertex, edge.get_other(pivot_vertex), edge.get_weight()+dist[pivot_vertex.val]);
-                        std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
+                        // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
                         if (in(new_edge.get_left().val, pivot_vertices)) {
                             reweight(new_edge, new_edge.get_right(), end);
                         }
                         else {
                             reweight(new_edge, new_edge.get_left(), end);
                         }
-                        std::cout << "New weight: " << new_edge.get_weight() << std::endl;
+                        // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
                         // Then push it to the queue
                         pq.push(new_edge);
                     }
@@ -339,7 +343,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
         }
         Edge best = pq.top(); pq.pop();
         solution_edges.push_back(best);
-        std::cout << "=======We chose the best: " << best << std::endl;
+        // std::cout << "=======We chose the best: " << best << std::endl;
         Vertex first_vertex, second_vertex, old_vertex, new_vertex;
         first_vertex = best.get_left(); second_vertex = best.get_right();
         bool in_first = in(first_vertex.val, pivot_vertices);
@@ -386,7 +390,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
         union_set.union_operation(best.get_left().val, best.get_right().val);
         // If vertex found:
         if (end.val == new_vertex.val) {
-            std::cout << "We found edge number " << end.val << " with " << new_vertex.val << " !! :O" << std::endl;
+            // std::cout << "We found edge number " << end.val << " with " << new_vertex.val << " !! :O" << std::endl;
             break;
         }
         // And if vertex not found, pop the rest of the edges out
@@ -398,7 +402,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::A_Star(Vertex v, Vertex
     }
     return std::tuple(dist, prev);
 }
-        
+
 
 std::ostream& operator<<(std::ostream& os, Graph& G) {
     os << G.get_string();
