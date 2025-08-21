@@ -9,13 +9,36 @@ GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learni
     int num_inputs = 2; // 2
     int num_outputs = 50; // 50
     int num_perceptrons = 4; // 4
-    int batch_size = m; // 1
+    // int batch_size = m; // 1
+    int output_size = m; // 1
 
     // Generate input X (for now only one training input instance)
-    X = Matrix(std::vector<double>{0, 9}, num_inputs, batch_size);
+    X = Matrix(std::vector<double>{0, 9}, num_inputs, output_size);
+
+
+    
+
+    // Generate adjacency Matrix ADJ with large basic value for unfilled spaces
+    int adj_largest_entry = 0;
+    for (int i = 0; i < G.get_adj().size(); i++) {
+        if (G.get_adj()[i].size() > adj_largest_entry) {
+            adj_largest_entry = G.get_adj()[i].size();
+        }
+    }
+    int index;
+    DENSE_ADJ = Matrix(0, G.get_adj().size(), adj_largest_entry);
+    for (auto edges : G.get_adj()) {
+        index = 0;
+        for (Edge e : edges) {
+            DENSE_ADJ(e.get_left().val, index) = e.get_right().val;
+            index++;
+        }
+    }
+
+    // std::cout << "summmm \n\n" << DENSE_ADJ << std::endl <<std::endl;
 
     // Generate output Y
-    Y = Matrix(num_outputs, batch_size);
+    Y = Matrix(num_outputs, output_size);
 
     xavier_initialization();
 
@@ -24,25 +47,25 @@ GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learni
     W_2 = Matrix(num_outputs, num_perceptrons, xavier_lower_bound, xavier_upper_bound);
 
     // Generate biases
-    B_1 = Matrix(num_perceptrons, batch_size);
-    B_2 = Matrix(num_outputs, batch_size);
+    B_1 = Matrix(num_perceptrons, output_size);
+    B_2 = Matrix(num_outputs, output_size);
 
     // Generate main matrices
     A_0 = X;
-    A_1 = Matrix(num_perceptrons, batch_size);
-    A_2 = Matrix(num_outputs, batch_size);
+    A_1 = Matrix(num_perceptrons, output_size);
+    A_2 = Matrix(num_outputs, output_size);
 
     // Generate weighted and biased sum matrices
-    Z_1 = Matrix(num_perceptrons, batch_size);
-    Z_2 = Matrix(num_outputs, batch_size);
+    Z_1 = Matrix(num_perceptrons, output_size);
+    Z_2 = Matrix(num_outputs, output_size);
 
     // Generate partial derivative matrices
-    dz_2 = Matrix(num_outputs, batch_size);
-    dz_1 = Matrix(num_perceptrons, batch_size);
+    dz_2 = Matrix(num_outputs, output_size);
+    dz_1 = Matrix(num_perceptrons, output_size);
     dw_2 = Matrix(num_outputs, num_perceptrons);
     dw_1 = Matrix(num_perceptrons, num_inputs);
-    db_2 = Matrix(num_perceptrons, batch_size);
-    db_1 = Matrix(num_perceptrons, batch_size);
+    db_2 = Matrix(num_perceptrons, output_size);
+    db_1 = Matrix(num_perceptrons, output_size);
 }
 
 void GNN::xavier_initialization() {
@@ -109,6 +132,7 @@ Matrix GNN::col_summation(Matrix& M) {
     return return_matrix;
 }
 
+
 void GNN::forward_propagation(Vertex start, Vertex end) {
     // Setting the two inputs for X
     X(0,0) = start.val;
@@ -153,7 +177,16 @@ void GNN::update_params() {
     print_params();
 }
 
-void GNN::update_Y(Vertex start, Vertex end) {
+
+void GNN::update_Y(Vertex start, Vertex end) { 
+    // Should now be an on/off adjacency matrix. 
+    // New penalizations to add instead: 
+    // - total penalization based off total weight of edges
+    // - penalization of selecting vertices not in the algorithm (correctly given by the adjacency matrix Y)
+    // - huge penalization of invalid edge: an entry in the A_2 adjacency matrix not originally in the graph adjacency matrix
+    // - if it is not a coherent path, then penalize heavily
+    // - I guess there should be a Y adjacency matrix and a Graph G adjacency matrix
+    
     Y.clear();
     solution.clear();
     std::tuple<std::vector<double>, std::vector<int>> tup = G.A_Star(start, end);
@@ -186,6 +219,7 @@ std::vector<Edge> GNN::predict(Vertex start, Vertex end) {
     std::cout << "Prediction, A_2: \n" << A_2 << std::endl;
     return std::vector<Edge>();  // Return prediction vector
 }
+
 
 void GNN::print_forward_prop(){
     std::cout << "Forward prop:\n" << A_0 << std::endl;

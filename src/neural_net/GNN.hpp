@@ -6,7 +6,7 @@
 class GNN {
     private:
         Graph G;
-        Matrix W_1, W_2, B_1, B_2, X, Y, A_0, A_1, A_2, Z_1, Z_2, dz_2, dz_1, dw_2, dw_1, db_2, db_1; // Input Layer X, and Cost Layer Y
+        Matrix W_1, W_2, B_1, B_2, X, Y, A_0, A_1, A_2, Z_1, Z_2, dz_2, dz_1, dw_2, dw_1, db_2, db_1, DENSE_ADJ; 
         double alpha;
         int m = 1;
         double xavier_upper_bound, xavier_lower_bound;

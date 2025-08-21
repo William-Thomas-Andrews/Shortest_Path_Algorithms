@@ -54,8 +54,8 @@ int DeltaField::activate_A_Star() {
 
 int DeltaField::activate_neural_network() {
     // std::cout << G << std::endl;
-    Neural_Network = GNN(G, 0.1);
-    Neural_Network.train(2000);
+    Neural_Network = GNN(G, .1);
+    Neural_Network.train(1);
     Vertex v1 = G.get_vertex(0);
     Vertex v2 = G.get_vertex(10);
     Neural_Network.predict(v1, v2);

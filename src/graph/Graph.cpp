@@ -18,7 +18,8 @@ Graph::Graph(std::string file_path) {
     folly::dynamic data = parse_json(file_path);
     Vertex v1, v2;
     Weight weight;
-    adj.resize(data["edges"].size() * 2);
+    // adj.resize(data["edges"].size() * 2);
+    adj.resize(data["vertices"].size());
     for (auto edge : data["edges"]) {
         v1 = Vertex(
             data["vertices"][edge["from"].asInt()]["id"].asInt(), 
