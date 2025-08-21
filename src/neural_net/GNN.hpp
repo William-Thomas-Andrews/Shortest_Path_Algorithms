@@ -10,25 +10,31 @@ class GNN {
         double alpha;
         int m = 1;
         double xavier_upper_bound, xavier_lower_bound;
+        std::vector<Edge> solution;
     
     public:
 
         GNN();
         GNN(Graph G, double learning_rate);
-        void operator=(const GNN& other);
-
-        void xavier_initialization();
+        
         Matrix sigmoid(Matrix& M);
         Matrix sigmoid_prime(Matrix& M);
         Matrix softmax(Matrix& M);
         Matrix square(Matrix& M);
         Matrix col_summation(Matrix& M);
 
+        void xavier_initialization();
         void forward_propagation(Vertex start, Vertex end);
+        void training_forward_propagation();
         void backward_propagation();
         void update_params();
+        void update_Y(Vertex start, Vertex end);
 
-        void train();
+        void train(int iterations);
         std::vector<Edge> predict(Vertex start, Vertex end);
+
+        void print_forward_prop();
+        void print_backward_prop();
+        void print_params();
 
 };
