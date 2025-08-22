@@ -6,15 +6,16 @@ GNN::GNN() {}
 
 GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learning_rate) {
 
-    int num_inputs = 2; // 2
+    int num_inputs = 1; // 1
     int num_outputs = G.get_adj().size(); // 45
-    int num_perceptrons = 10; // 4
+    int num_perceptrons = 10; // 10
     // int batch_size = m; // 1
     int output_size = num_outputs; // 45
     std::cout << "hegiirge" << std::endl;
 
     // Generate input X (for now only one training input instance)
-    X = Matrix(num_inputs, output_size);
+    X = Matrix(num_inputs, num_outputs);
+    // Change X to being dimensions: features x num_outputs=45, then the other matrix logic will work and the output will be 45x45
 
     // Generate output Y
     Y = Matrix(num_outputs, output_size);
@@ -26,8 +27,8 @@ GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learni
     W_2 = Matrix(num_outputs, num_perceptrons, xavier_lower_bound, xavier_upper_bound);
     
     // Generate biases
-    B_1 = Matrix(num_perceptrons, output_size);
-    B_2 = Matrix(num_outputs, output_size);
+    B_1 = Matrix(num_perceptrons, num_outputs);
+    B_2 = Matrix(num_outputs, num_outputs);
 
     // Generate main matrices
     A_0 = X;
@@ -157,13 +158,16 @@ void GNN::mask_incorrect_entries(Matrix& M) {
 
 void GNN::forward_propagation(Vertex start, Vertex end) {
     // Setting the two inputs for X
-    std::cout << "hegiiiuvougvuvrge11" << std::endl;
-    X(0,0) = start.val;
-    X(1,0) = end.val;
-    A_0 = X;
-    Z_1 = dot(W_1, A_0) + B_1;
+    X(0,start.val) = start.val;
+    X(0,end.val) = end.val; 
+    A_0 = X; //
+    
+    Z_1 = dot(W_1, A_0) + B_1;//dot(B_1, Matrix(1, 1, A_0.get_cols()));
+    std::cout << "gerg" << std::endl;
     A_1 = sigmoid(Z_1);
-    Z_2 = dot(W_2, A_1) + B_2;
+    Z_2 = dot(W_2, A_1) + B_2;//dot(B_2, Matrix(1, 1, A_1.get_cols()));
+        std::cout << "dims " << A_1.get_cols() << std::endl;
+
     mask_incorrect_entries(Z_2);
     A_2 = softmax(Z_2); 
     print_forward_prop();
@@ -187,15 +191,19 @@ void GNN::backward_propagation(Vertex start, Vertex end) {
     // check_cycles(start, end);
     
     // Step 1
-    // dz_2 = A_2 - Y;
+    dz_2 = A_2 - Y;
     dz_2 = (-1) * (Y.sum_elements() * log(A_2));
     dw_2 = dot(dz_2, A_1.Transpose()) * (1/m);
-    db_2 = col_summation(dz_2) * (1/m);
-    
+    // db_2 = col_summation(dz_2) * (1/m);
+    db_2 = dz_2 * (1/m);
+    // replace^
+
     // Step 2
     dz_1 = dot(W_2.Transpose(), dz_2) * sigmoid_prime(Z_1);
     dw_1 =  dot(dz_1, X.Transpose()) * ((double) (1/m));
-    db_1 = col_summation(dz_1) * ((double)(1/m));
+    // db_1 = col_summation(dz_1) * ((double)(1/m));
+    db_1 = dz_1 * (1/m);
+    //replace^
 
     print_backward_prop();
 }
@@ -203,6 +211,7 @@ void GNN::backward_propagation(Vertex start, Vertex end) {
 void GNN::update_params() {
     print_params();
     W_1 = W_1 - alpha * dw_1;
+    std::cout << "here" << std::endl;
     B_1 = B_1 - alpha * db_1;
     W_2 = W_2 - alpha * dw_2;
     B_2 = B_2 - alpha * db_2;
@@ -212,6 +221,9 @@ void GNN::update_params() {
 
 void GNN::update_Y(Vertex start, Vertex end) { 
     Y.clear();
+    // perform A*
+    // get items
+    // update Y to be the adjacency matrix 
 }
 
 void GNN::check_valid_edges() { // Operate on A_2, iterate through, check if adj matrix has a representation. if not, penalize that jump entry

@@ -57,7 +57,7 @@ int DeltaField::activate_neural_network() {
     std::cout << "heyy1" << std::endl;
     Neural_Network = GNN(G, 0.01);
     std::cout << "summmjonom \n\n" << G << std::endl <<std::endl;
-    Neural_Network.train(2000);
+    Neural_Network.train(200);
     Vertex v1 = G.get_vertex(1);
     Vertex v2 = G.get_vertex(10);
     Neural_Network.predict(v1, v2);
