@@ -6,10 +6,7 @@
 void run_all_tests() {
 
     // TODO: Simplify Everything and make it cleaner and more efficient. Simplify the mess in the Graph and DeltaField classes lol.
-    // TODO: Change Neural Network from learning weights to learning which edges to flip on or off (use softmax) and number the edges of course
-    // in order to do this. Factor in weights somehow either individually or penalize with total weight. We are not trying to have it guess 
-    // weight, but we want it to guess what edge to use, penalizing bad edge choices that result in higher weight.
-    // TODO: Scale up to multiple training examples (batch size).
+    // TODO: Finish parallelization.
     // TODO UnionFind pivot_union = UnionFind(adj.size());
 
     std::cout << "heyy" << std::endl;
@@ -54,8 +51,10 @@ void run_all_tests() {
     std::cout << G << std::endl;
     DeltaField DF(G);
 
+    DF.activate_A_Star();
+
     // std::cout << DF.activate_A_Star() << std::endl;
 
-    DF.activate_neural_network();
+    // DF.activate_neural_network();
 
 }

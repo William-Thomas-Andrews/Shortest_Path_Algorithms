@@ -16,11 +16,11 @@ std::vector<int> get_and_print_path(const std::vector<int>& prev, int start, int
     path.push_back(start);
     std::reverse(path.begin(), path.end());
 
-    std::cout << "Path: ";
-    for (int v : path) {
-        std::cout << v << " ";
-    }
-    std::cout << std::endl;
+    // std::cout << "Path: ";
+    // for (int v : path) {
+    //     std::cout << v << " ";
+    // }
+    // std::cout << std::endl;
     return path;
 }
 

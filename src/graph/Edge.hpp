@@ -15,8 +15,8 @@ class Edge {
 
         std::string get_string();
         
-        Vertex get_left();
-        Vertex get_right();
+        Vertex get_source();
+        Vertex get_destination();
         Weight get_weight();
         Vertex get_other(Vertex v);
         void set_weight(Weight w);

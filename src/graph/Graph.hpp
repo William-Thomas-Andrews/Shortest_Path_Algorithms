@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "folly/dynamic.h"
 #include "folly/json.h"
 #include "UnionFind.cpp"
@@ -67,9 +68,17 @@ class Graph {
 
         signed long potential(Vertex start, Vertex end);
 
+        void heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end);
+
         void reweight(Edge& edge, Vertex leading_vertex, Vertex end);
+
+        void auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, UnionFind& union_set);
         
-        std::tuple<std::vector<double>, std::vector<int>> A_Star(Vertex v, Vertex end);
+        std::tuple<std::vector<double>, std::vector<int>> Seriel_A_Star(Vertex v, Vertex end);
+
+        std::tuple<std::vector<double>, std::vector<int>> Parallel_A_Star(Vertex v, Vertex end);
+
+        void Auxiliary_Dijkstra(Vertex v, Vertex end, std::vector<int>& prev, UnionFind& union_set);
         
         friend std::ostream& operator<<(std::ostream& os, Graph& G);
 };

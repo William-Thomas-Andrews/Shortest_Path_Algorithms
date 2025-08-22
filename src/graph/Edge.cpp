@@ -13,12 +13,12 @@ std::string Edge::get_string() {
     return str;
 }
 
-Vertex Edge::get_left() { return v; }
-Vertex Edge::get_right() { return u; }
+Vertex Edge::get_source() { return v; }
+Vertex Edge::get_destination() { return u; }
 Weight Edge::get_weight() { return weight; }
 Vertex Edge::get_other(Vertex v) { 
-    if (this->get_left().val == v.val) { return this->get_right(); }
-    if (this->get_right().val == v.val) { return this->get_left(); }
+    if (this->get_source().val == v.val) { return this->get_destination(); }
+    if (this->get_destination().val == v.val) { return this->get_source(); }
     else { return Vertex(); }
 }
 void Edge::set_weight(Weight w) { weight = w; }
@@ -33,7 +33,7 @@ bool Edge::operator>(Edge& e2) {
 }
 // Comparison operator ==
 bool Edge::operator==(Edge& e2) {
-    if (v.val == e2.get_left().val and u.val == e2.get_right().val) return true;
+    if (v.val == e2.get_source().val and u.val == e2.get_destination().val) return true;
     return false;
 }
 // Comparison operator !=

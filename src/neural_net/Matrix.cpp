@@ -194,6 +194,8 @@ std::string Matrix::get_string() {
 
 double Matrix::get_element(int row_index, int col_index) {
     if (rows <= row_index) {
+        std::cout << "Dims: " << rows << "x" << columns << std::endl;
+        std::cout << "Row index: " << row_index << std::endl;
         throw std::out_of_range("Row index out of range");
         return INT_MIN;
     }
@@ -202,6 +204,8 @@ double Matrix::get_element(int row_index, int col_index) {
         return INT_MIN;
     }
     if (columns <= col_index) {
+        std::cout << "Dims: " << rows << "x" << columns << std::endl;
+        std::cout << "Col index: " << col_index << std::endl;
         throw std::out_of_range("Column index out of range");
         return INT_MIN;
     }
@@ -254,11 +258,10 @@ Matrix Matrix::Transpose() {
 // }
 
 double& Matrix::operator()(int row_index, int col_index) const {
-    if (rows <= row_index) { throw std::out_of_range("Row index out of range"); }
-    if (0 > row_index) { throw std::out_of_range("Row index cannot be negative"); }
-    if (columns <= col_index) { throw std::out_of_range("Column index out of range"); }
-    if (0 > col_index) { throw std::out_of_range("Column index cannot be negative"); }
-
+    if (rows <= row_index) { std::cout << "Dims: " << rows << "x" << columns << "\rRow index: " << row_index << std::endl; throw std::out_of_range("Row index out of range"); }
+    if (0 > row_index) { std::cout << "Dims: " << rows << "x" << columns << "\nRow index: " << row_index << std::endl; throw std::out_of_range("Row index cannot be negative"); }
+    if (columns <= col_index) { std::cout << "Dims: " << rows << "x" << columns << "\nCol index: " << col_index << std::endl; throw std::out_of_range("Column index out of range"); }
+    if (0 > col_index) { std::cout << "Dims: " << rows << "x" << columns << "\nCol index: " << col_index << std::endl; throw std::out_of_range("Column index cannot be negative"); }
     return matrix_array[(row_index * columns) + col_index];
 }
 
