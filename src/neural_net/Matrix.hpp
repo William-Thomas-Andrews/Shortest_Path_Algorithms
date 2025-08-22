@@ -20,15 +20,17 @@ class Matrix {
         Matrix(const std::vector<double>& data, int num_rows, int num_columns);
         Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns);
         Matrix(double* data, int data_size, int num_rows, int num_columns);
-
+        Matrix(const Matrix& other);
+        Matrix(Matrix&& other);
+        Matrix& operator=(Matrix&& other);
         ~Matrix();
 
         // Operators
+        Matrix& operator=(const Matrix& other);
         Matrix operator+(const Matrix& other);
         Matrix operator-(const Matrix& other);
         Matrix operator*(const Matrix& other);
         Matrix operator/(const Matrix& other);
-        void operator=(const Matrix& other);
         bool operator==(const Matrix& other);
         bool operator!=(const Matrix& other);
 
@@ -45,9 +47,10 @@ class Matrix {
         int get_cols();
 
         double sum_elements();
+        double sum_row(int row);
 
         Matrix Transpose();
-        Matrix operator()(int row_index) ;
+        // Matrix operator()(int row_index) ;
         double& operator()(int row_index, int col_index) const ;
         void clear();
 

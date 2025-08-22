@@ -45,11 +45,49 @@ Matrix::Matrix(double* data, int data_size, int num_rows, int num_columns) : row
     for (int i = 0; i < size; i++) { matrix_array[i] = data[i]; }
 }
 
+Matrix::Matrix(const Matrix& other) { // copy constructor
+    rows = other.rows;
+    columns = other.columns;
+    size = other.size;
+    matrix_array = (double *) malloc(size * sizeof(double));
+    for (int i = 0; i < size; i++) {
+        matrix_array[i] = other.matrix_array[i];
+    }
+}
+
+Matrix::Matrix(Matrix&& other) noexcept : rows(other.rows), columns(other.columns), matrix_array(other.matrix_array) {
+    // other.matrix_array = nullptr;
+    free(other.matrix_array);
+}
+
+Matrix& Matrix::operator=(Matrix&& other) noexcept {
+    if (this != &other) {
+        free(matrix_array); 
+        rows = other.rows;
+        columns = other.columns;
+        matrix_array = other.matrix_array;
+        other.matrix_array = nullptr;
+    }
+    return *this;
+}
+
 Matrix::~Matrix() { free(matrix_array); }
 
 
-
 // Matrix Operators
+Matrix& Matrix::operator=(const Matrix& other) { // Copy assignment
+    if (this == &other) { return *this; }
+    free(matrix_array);
+    size = other.size;
+    rows = other.rows;
+    columns = other.columns;
+    matrix_array = (double*) malloc(other.size * sizeof(double));
+    for (int i = 0; i < other.size; i++) {
+        matrix_array[i] = other.matrix_array[i];
+    }
+    return *this;
+}
+
 Matrix Matrix::operator+(const Matrix& other) {
     if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix addition."); }
     if (columns != other.columns) { throw std::invalid_argument("Column sizes must match to perform matrix addition."); }
@@ -61,8 +99,8 @@ Matrix Matrix::operator+(const Matrix& other) {
 }
 
 Matrix Matrix::operator-(const Matrix& other) {
-    if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix addition."); }
-    if (columns != other.columns) { throw std::invalid_argument("Column sizes must match to perform matrix addition."); }
+    if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix subtraction."); }
+    if (columns != other.columns) { std::cout << rows << "x" << columns << " - " << other.rows << "x" << other.columns << std::endl; throw std::invalid_argument("Column sizes must match to perform matrix subtraction."); }
     Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
     for (int i = 0; i < size; i++) {
         return_matrix.matrix_array[i] -= other.matrix_array[i];
@@ -71,8 +109,8 @@ Matrix Matrix::operator-(const Matrix& other) {
 }
 
 Matrix Matrix::operator*(const Matrix& other) {
-    if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix addition."); }
-    if (columns != other.columns) { throw std::invalid_argument("Column sizes must match to perform matrix addition."); }
+    if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix multiplication."); }
+    if (columns != other.columns) { throw std::invalid_argument("Column sizes must match to perform matrix multiplication."); }
     Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
     for (int i = 0; i < size; i++) {
         return_matrix.matrix_array[i] *= other.matrix_array[i];
@@ -81,8 +119,8 @@ Matrix Matrix::operator*(const Matrix& other) {
 }
 
 Matrix Matrix::operator/(const Matrix& other) {
-    if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix addition."); }
-    if (columns != other.columns) { throw std::invalid_argument("Column sizes must match to perform matrix addition."); }
+    if (rows != other.rows) { throw std::invalid_argument("Row sizes must match to perform matrix division."); }
+    if (columns != other.columns) { throw std::invalid_argument("Column sizes must match to perform matrix division."); }
     Matrix return_matrix = Matrix(matrix_array, size, rows, columns);
     for (int i = 0; i < size; i++) {
         return_matrix.matrix_array[i] /= other.matrix_array[i];
@@ -90,18 +128,7 @@ Matrix Matrix::operator/(const Matrix& other) {
     return return_matrix;
 }
 
-void Matrix::operator=(const Matrix& other) { // Copy assignment
-    if (this == &other) { return; }
-    double* new_array = (double*) malloc(other.size * sizeof(double));
-    for (int i = 0; i < other.size; i++) {
-        new_array[i] = other.matrix_array[i];
-    }
-    // free(matrix_array)
-    matrix_array = new_array;
-    size = other.size;
-    rows = other.rows;
-    columns = other.columns;
-}
+
 
 bool Matrix::operator==(const Matrix& other) {
     if ((rows != other.rows) || (columns != other.columns)) { return false; }
@@ -197,6 +224,14 @@ double Matrix::sum_elements() {
     return sum;
 }
 
+double Matrix::sum_row(int row) {
+    double sum = 0;
+    for (int j = 0; j < columns; j++) {
+        sum += get_element(row, j);
+    }
+    return sum;
+}
+
 Matrix Matrix::Transpose() {
     Matrix B = Matrix(columns, rows);
     int b_index = 0;
@@ -209,15 +244,15 @@ Matrix Matrix::Transpose() {
     return B;
 }
 
-Matrix Matrix::operator()(int row_index) {
-    if (rows <= row_index) { throw std::out_of_range("Row index out of range"); }
-    if (0 > row_index) { throw std::out_of_range("Row index cannot be negative"); }
-    double *return_data = (double *) malloc(columns * sizeof(double));
-    for (int i = 0; i < columns; i++) {
-        return_data[i] = matrix_array[i + row_index*columns];
-    }
-    return Matrix(return_data, columns, 1, columns);
-}
+// Matrix Matrix::operator()(int row_index) {
+//     if (rows <= row_index) { throw std::out_of_range("Row index out of range"); }
+//     if (0 > row_index) { throw std::out_of_range("Row index cannot be negative"); }
+//     double *return_data = (double *) malloc(columns * sizeof(double));
+//     for (int i = 0; i < columns; i++) {
+//         return_data[i] = matrix_array[i + row_index*columns];
+//     }
+//     return Matrix(return_data, columns, 1, columns);
+// }
 
 double& Matrix::operator()(int row_index, int col_index) const {
     if (rows <= row_index) { throw std::out_of_range("Row index out of range"); }
@@ -330,7 +365,7 @@ Matrix operator*(double val, const Matrix& M) {
     return return_matrix;
 }
 Matrix operator/(double val, const Matrix& M) {
-    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.rows);
+    Matrix return_matrix = Matrix(M.matrix_array, M.size, M.rows, M.columns);
     std::cout << "le " << return_matrix << std::endl;
     for (int i = 0; i < return_matrix.rows; i++) {
         for (int j = 0; j < return_matrix.columns; j++) {

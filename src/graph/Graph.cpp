@@ -18,8 +18,10 @@ Graph::Graph(std::string file_path) {
     folly::dynamic data = parse_json(file_path);
     Vertex v1, v2;
     Weight weight;
+    
     // adj.resize(data["edges"].size() * 2);
     adj.resize(data["vertices"].size());
+    adjacency_matrix = Matrix(data["vertices"].size(), data["vertices"].size());
     for (auto edge : data["edges"]) {
         v1 = Vertex(
             data["vertices"][edge["from"].asInt()]["id"].asInt(), 
@@ -33,24 +35,26 @@ Graph::Graph(std::string file_path) {
             data["vertices"][edge["to"].asInt()]["y"].asInt()
         );
         if (!in(v2.val, stored_vertices)) { stored_vertices.push_back(v2); }
+        
         weight = edge["weight"].asInt();
         this->add_element(Edge(v1, v2, weight));
+        adjacency_matrix(v1.val, v2.val) = weight;
         ordered_vertices.push_back(v1); ordered_vertices.push_back(v2);
-        std::cout << v1.val << " " << v2.val << std::endl; 
+        // std::cout << v1.val << " " << v2.val << std::endl; 
     }
-
     // GenerateGraph();
+    std::cout << &ordered_vertices << std::endl;
 }
 
-void Graph::operator=(const Graph& other) {
-    edges = other.edges;
-    union_set = other.union_set;
-    adj = other.adj;
-    stored_vertices = other.stored_vertices;
-    union_vertices = other.union_vertices;
-    solution_edges = other.solution_edges;
-    ordered_vertices = other.ordered_vertices;
-}
+// void Graph::operator=(const Graph& other) {
+//     edges = other.edges;
+//     union_set = other.union_set;
+//     adj = other.adj;
+//     stored_vertices = other.stored_vertices;
+//     union_vertices = other.union_vertices;
+//     solution_edges = other.solution_edges;
+//     ordered_vertices = other.ordered_vertices;
+// }
 
 Vertex Graph::operator[](int vertex_index) {
     for (Vertex v : ordered_vertices) { if (vertex_index == v.val) { return v; } }
@@ -64,6 +68,10 @@ folly::dynamic Graph::parse_json(std::string file_path) {
     std::string line;
     while (std::getline(file, line)) { output += line; }
     return folly::parseJson(output);
+}
+
+Matrix& Graph::get_adjacency_matrix() {
+    return adjacency_matrix;
 }
 
 std::tuple<Vertex, Vertex> Graph::get_random_vertex_pair() {

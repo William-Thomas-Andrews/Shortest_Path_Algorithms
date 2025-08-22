@@ -4,6 +4,7 @@
 #include "folly/json.h"
 #include "UnionFind.cpp"
 #include "Edge.cpp"
+#include "Matrix.cpp"
 
 
 // The input set for a Graphic Matroid
@@ -16,15 +17,18 @@ class Graph {
         UnionFind union_vertices;
         std::vector<Edge> solution_edges;
         std::vector<Vertex> ordered_vertices;
+        Matrix adjacency_matrix;
 
     public:
         Graph();
         Graph(int size);
         Graph(std::string file_path);
 
-        void operator=(const Graph& other);
+        // void operator=(const Graph& other);
 
         Vertex operator[](int vertex_index);
+
+        Matrix& get_adjacency_matrix();
 
         folly::dynamic parse_json(std::string file_path);
 

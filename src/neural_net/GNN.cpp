@@ -1,41 +1,20 @@
 #include "GNN.hpp"
 #include "Utils.cpp"
 
-GNN::GNN() {}
 
+GNN::GNN() {}
 
 GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learning_rate) {
 
     int num_inputs = 2; // 2
-    int num_outputs = 50; // 50
-    int num_perceptrons = 4; // 4
+    int num_outputs = G.get_adj().size(); // 45
+    int num_perceptrons = 10; // 4
     // int batch_size = m; // 1
-    int output_size = m; // 1
+    int output_size = num_outputs; // 45
+    std::cout << "hegiirge" << std::endl;
 
     // Generate input X (for now only one training input instance)
-    X = Matrix(std::vector<double>{0, 9}, num_inputs, output_size);
-
-
-    
-
-    // Generate adjacency Matrix ADJ with large basic value for unfilled spaces
-    int adj_largest_entry = 0;
-    for (int i = 0; i < G.get_adj().size(); i++) {
-        if (G.get_adj()[i].size() > adj_largest_entry) {
-            adj_largest_entry = G.get_adj()[i].size();
-        }
-    }
-    int index;
-    DENSE_ADJ = Matrix(0, G.get_adj().size(), adj_largest_entry);
-    for (auto edges : G.get_adj()) {
-        index = 0;
-        for (Edge e : edges) {
-            DENSE_ADJ(e.get_left().val, index) = e.get_right().val;
-            index++;
-        }
-    }
-
-    // std::cout << "summmm \n\n" << DENSE_ADJ << std::endl <<std::endl;
+    X = Matrix(num_inputs, output_size);
 
     // Generate output Y
     Y = Matrix(num_outputs, output_size);
@@ -45,7 +24,7 @@ GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learni
     // Generate weights
     W_1 = Matrix(num_perceptrons, num_inputs, xavier_lower_bound, xavier_upper_bound);
     W_2 = Matrix(num_outputs, num_perceptrons, xavier_lower_bound, xavier_upper_bound);
-
+    
     // Generate biases
     B_1 = Matrix(num_perceptrons, output_size);
     B_2 = Matrix(num_outputs, output_size);
@@ -58,7 +37,7 @@ GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learni
     // Generate weighted and biased sum matrices
     Z_1 = Matrix(num_perceptrons, output_size);
     Z_2 = Matrix(num_outputs, output_size);
-
+    
     // Generate partial derivative matrices
     dz_2 = Matrix(num_outputs, output_size);
     dz_1 = Matrix(num_perceptrons, output_size);
@@ -66,6 +45,7 @@ GNN::GNN(Graph input_graph, double learning_rate) : G(input_graph), alpha(learni
     dw_1 = Matrix(num_perceptrons, num_inputs);
     db_2 = Matrix(num_perceptrons, output_size);
     db_1 = Matrix(num_perceptrons, output_size);
+    std::cout << "hegiirge1b1" << std::endl;
 }
 
 void GNN::xavier_initialization() {
@@ -99,13 +79,35 @@ Matrix GNN::sigmoid_prime(Matrix& M) {
 
 Matrix GNN::softmax(Matrix& M) {
     Matrix return_matrix = Matrix(M.get_rows(), M.get_cols());
+   
     for (int i = 0; i < return_matrix.get_rows(); i++) {
+        double max = -100000;
+        for (int p = 0; p < return_matrix.get_cols(); p++) {
+            if (M(i, p) > max) { max = M(i, p); }
+        }
         for (int j = 0; j < return_matrix.get_cols(); j++) {
-            return_matrix(i, j) = exp(M(i, j));
+            return_matrix(i, j) = exp(M(i, j) - max);
+        }
+        double sum = return_matrix.sum_row(i);
+        for (int k = 0; k < return_matrix.get_cols(); k++) {
+            return_matrix(i, k) /= sum;
         }
     }
-    double sum = return_matrix.sum_elements();
-    return_matrix = return_matrix / sum;
+    return return_matrix;
+}
+
+Matrix GNN::ReLU(Matrix& M) {
+    Matrix return_matrix = Matrix(M.get_rows(), M.get_cols());
+    for (int i = 0; i < return_matrix.get_rows(); i++) {
+        for (int j = 0; j < return_matrix.get_cols(); j++) {
+            if (M(i, j) > 0) {
+                return_matrix(i, j) = M(i, j);
+            }
+            else {
+                return_matrix(i, j) = 0;
+            }
+        }
+    }
     return return_matrix;
 }
 
@@ -114,6 +116,16 @@ Matrix GNN::square(Matrix& M) {
     for (int i = 0; i < M.get_rows(); i++) {
         for (int j = 0; j < M.get_cols(); j++) {
             return_matrix(i, j) = M(i,j) * M(i, j);
+        }
+    }
+    return return_matrix;
+}
+
+Matrix GNN::log(Matrix& M) {
+    Matrix return_matrix = Matrix(M.get_rows(), M.get_cols());
+    for (int i = 0; i < M.get_rows(); i++) {
+        for (int j = 0; j < M.get_cols(); j++) {
+            return_matrix(i, j) = std::log(M(i,j));
         }
     }
     return return_matrix;
@@ -132,31 +144,51 @@ Matrix GNN::col_summation(Matrix& M) {
     return return_matrix;
 }
 
+void GNN::mask_incorrect_entries(Matrix& M) {
+    for (int i = 0; i < M.get_rows(); i++) {
+        for (int j = 0; j < M.get_cols(); j++) {
+            if ((M(i, j) > 0) and ((G.get_adjacency_matrix())(i, j)) < 0) { // If this vertex does not create a valid edge in the graph
+                M(i, j) = 0; // Then mask it
+            }
+        }
+    }
+}
+
 
 void GNN::forward_propagation(Vertex start, Vertex end) {
     // Setting the two inputs for X
+    std::cout << "hegiiiuvougvuvrge11" << std::endl;
     X(0,0) = start.val;
     X(1,0) = end.val;
     A_0 = X;
     Z_1 = dot(W_1, A_0) + B_1;
     A_1 = sigmoid(Z_1);
     Z_2 = dot(W_2, A_1) + B_2;
-    // A_2 = softmax(Z_2);
-    A_2 = Z_2;
+    mask_incorrect_entries(Z_2);
+    A_2 = softmax(Z_2); 
     print_forward_prop();
 }
 
-void GNN::training_forward_propagation() {
+void GNN::training_propagation() {
+    // std::cout << "heyy!!" << std::endl;
+    std::cout << "hegiirgregegre" << std::endl;
     std::tuple<Vertex, Vertex> vertex_pair = G.get_random_vertex_pair();
     Vertex start = std::get<0>(vertex_pair);
     Vertex end = std::get<1>(vertex_pair);
+    std::cout << "hegiirge" << std::endl;
     forward_propagation(start, end);
     update_Y(start, end);
+    backward_propagation(start, end);
 }
 
-void GNN::backward_propagation() {
+void GNN::backward_propagation(Vertex start, Vertex end) {
+
+    // check_valid_edges();
+    // check_cycles(start, end);
+    
     // Step 1
-    dz_2 = A_2 - Y;
+    // dz_2 = A_2 - Y;
+    dz_2 = (-1) * (Y.sum_elements() * log(A_2));
     dw_2 = dot(dz_2, A_1.Transpose()) * (1/m);
     db_2 = col_summation(dz_2) * (1/m);
     
@@ -179,37 +211,62 @@ void GNN::update_params() {
 
 
 void GNN::update_Y(Vertex start, Vertex end) { 
-    // Should now be an on/off adjacency matrix. 
-    // New penalizations to add instead: 
-    // - total penalization based off total weight of edges
-    // - penalization of selecting vertices not in the algorithm (correctly given by the adjacency matrix Y)
-    // - huge penalization of invalid edge: an entry in the A_2 adjacency matrix not originally in the graph adjacency matrix
-    // - if it is not a coherent path, then penalize heavily
-    // - I guess there should be a Y adjacency matrix and a Graph G adjacency matrix
-    
     Y.clear();
-    solution.clear();
-    std::tuple<std::vector<double>, std::vector<int>> tup = G.A_Star(start, end);
-    std::vector<double> dist = std::get<0>(tup);
-    std::vector<int> prev = std::get<1>(tup);
-    std::vector<int> path = get_and_print_path(prev, start.val, end.val);
-    for (int at = end.val; at != start.val && at != -1; at = prev[at]) { // change into a function soon
-        for (Edge e : G.get_adj()[at]) {
-            if (e.get_left().val == prev[at]) {
-                solution.push_back(e);
-            }
-        }
-    }
-    std::reverse(solution.begin(), solution.end());
-    for (int i = 0; i < solution.size(); i++) { // updating Y
-        Y(i, 0) = solution[i].get_weight();
-    }
+}
+
+void GNN::check_valid_edges() { // Operate on A_2, iterate through, check if adj matrix has a representation. if not, penalize that jump entry
+
+}
+
+void GNN::check_cycles(Vertex start, Vertex end) { // Iterate through the path. If path does not start at the start, penalize the whole thing (or just the start) 
+    // // if does not end at the end, then penalize the whole thing (or just the end), if creates a cycle, penalize the cycle. Once path is finished
+    // // or it hits a cycle, penalize anything not in the main path with big points.
+
+    // UnionFind union_set = UnionFind(A_2.get_rows());
+    // if (A_2(start.val, 0) < 0.5) { // If path produced by network does not start with the starting point
+    //     // A_2(start.val, 0) = 1 / A_2(start.val, 0); // penalize by a lot
+    //     A_2(start.val, 0) += 10;
+    //     return;
+    // }
+
+    
+    // // Scanning path until end for cycles
+    // double v1 = start.val;
+    // // std::cout << "huya " << A_2(v1, 0) << std::endl;
+    // // std::cout << union_set.find_operation(A_2(v1, 0)) << std::endl;
+    // std::vector<int> local_path;
+    // while (union_set.find_operation(A_2(v1, 0)) != -1 and union_set.find_operation(v1) != union_set.find_operation(A_2(v1, 0))) {
+    //     // std::cout << "rindex: " << union_set.find_operation(v1) << std::endl;
+    //     union_set.union_operation(v1, A_2(v1, 0));
+    //     local_path.push_back(A_2(v1, 0)); // for offsetting later when penalizing outside entries
+    //     v1 = A_2(v1, 0);
+    // }
+
+
+    // // If cycle found
+    // if (union_set.find_operation(v1) == union_set.find_operation(A_2(v1, 0))) {
+    //     A_2(A_2(v1, 0), 0) += 10; // penalize
+    //     A_2(v1, 0) += 10; // penalize
+    // }
+
+    // // Penalize entries outside this path
+    // for (int i = 0; i < A_2.get_rows(); i++) {
+    //     for (auto x : local_path) {
+    //         if (A_2(i, 0) == x) {
+    //             A_2(i, 0) -= 10;
+    //         }
+
+    //     }
+    // }
+    // for (int i = 0; i < A_2.get_rows(); i++) {
+    //     A_2(i, 0) += 10;
+    // }
 }
 
 void GNN::train(int iterations) { 
     for (int i = 0; i < iterations; i++) {
-        training_forward_propagation();
-        backward_propagation();
+        std::cout << "hegiirge11uigob" << std::endl;
+        training_propagation();
         update_params();
     }
 }

@@ -12,11 +12,13 @@ void run_all_tests() {
     // TODO: Scale up to multiple training examples (batch size).
     // TODO UnionFind pivot_union = UnionFind(adj.size());
 
-
+    std::cout << "heyy" << std::endl;
     Graph G;
     Vertex begin, end;
     std::string file_path;
+    std::cout << "heyy" << std::endl;
     std::tuple<Vertex, Vertex> vertex_pair; 
+    std::cout << "heyyi" << std::endl;
     std::tuple<std::vector<double>, std::vector<int>> tup;
     // for (int i = 8; i < 9; i++) {
     //     file_path = std::format("../src/data/data_set/data_{}.txt", i);
@@ -32,6 +34,7 @@ void run_all_tests() {
     // }
     file_path = "../src/data/data_set/data_london.txt";
     G = Graph(file_path);
+    std::cout << "heyy !!" << std::endl;
     // std::cout << G << std::endl;
 
     // vertex_pair = G.get_random_vertex_pair();
@@ -48,7 +51,7 @@ void run_all_tests() {
     // for (auto x : path) {
     //     std::cout << x << std::endl;
     // }
-
+    std::cout << G << std::endl;
     DeltaField DF(G);
 
     // std::cout << DF.activate_A_Star() << std::endl;
