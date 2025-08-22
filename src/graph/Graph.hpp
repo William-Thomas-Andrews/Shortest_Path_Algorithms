@@ -25,6 +25,7 @@ class Graph {
         Graph(std::string file_path);
 
         // void operator=(const Graph& other);
+        Graph& operator=(const Graph& other);
 
         Vertex operator[](int vertex_index);
 

@@ -46,6 +46,21 @@ Graph::Graph(std::string file_path) {
     std::cout << &ordered_vertices << std::endl;
 }
 
+Graph& Graph::operator=(const Graph& other) {
+    if (this != &other) {
+        
+        edges = other.edges;
+        union_set = other.union_set;
+        adj = other.adj;
+        stored_vertices = other.stored_vertices;
+        union_vertices = other.union_vertices;
+        solution_edges = other.solution_edges;
+        ordered_vertices = other.ordered_vertices;
+        adjacency_matrix = other.adjacency_matrix; 
+    }
+    return *this;
+}
+
 // void Graph::operator=(const Graph& other) {
 //     edges = other.edges;
 //     union_set = other.union_set;

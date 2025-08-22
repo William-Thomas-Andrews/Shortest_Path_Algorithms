@@ -55,21 +55,21 @@ Matrix::Matrix(const Matrix& other) { // copy constructor
     }
 }
 
-Matrix::Matrix(Matrix&& other) noexcept : rows(other.rows), columns(other.columns), matrix_array(other.matrix_array) {
-    // other.matrix_array = nullptr;
-    free(other.matrix_array);
-}
+// Matrix::Matrix(Matrix&& other) noexcept : rows(other.rows), columns(other.columns), matrix_array(other.matrix_array) {
+//     // other.matrix_array = nullptr;
+//     free(other.matrix_array);
+// }
 
-Matrix& Matrix::operator=(Matrix&& other) noexcept {
-    if (this != &other) {
-        free(matrix_array); 
-        rows = other.rows;
-        columns = other.columns;
-        matrix_array = other.matrix_array;
-        other.matrix_array = nullptr;
-    }
-    return *this;
-}
+// Matrix& Matrix::operator=(Matrix&& other) noexcept {
+//     if (this != &other) {
+//         free(matrix_array); 
+//         rows = other.rows;
+//         columns = other.columns;
+//         matrix_array = other.matrix_array;
+//         other.matrix_array = nullptr;
+//     }
+//     return *this;
+// }
 
 Matrix::~Matrix() { free(matrix_array); }
 
@@ -77,7 +77,6 @@ Matrix::~Matrix() { free(matrix_array); }
 // Matrix Operators
 Matrix& Matrix::operator=(const Matrix& other) { // Copy assignment
     if (this == &other) { return *this; }
-    free(matrix_array);
     size = other.size;
     rows = other.rows;
     columns = other.columns;
