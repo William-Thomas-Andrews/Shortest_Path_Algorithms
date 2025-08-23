@@ -50,28 +50,28 @@ int DeltaField::activate_A_Star() {
     std::cout << "Sum1: " << total << std::endl;
 
     // Time function2
-    // begin = std::get<0>(vertex_pair);
-    // end = std::get<1>(vertex_pair);
-    // auto start2 = std::chrono::high_resolution_clock::now();
-    // while (begin != end) {
-    //     std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
-    //     tup = G.Parallel_A_Star(begin, end);
-    //     dist = std::get<0>(tup);
-    //     prev = std::get<1>(tup);
-    //     path = get_and_print_path(prev, begin.val, end.val);
-    //     G.show_solution(prev, begin.val, end.val, i); 
-    //     step = G.get_vertex(path[1]);
-    //     total += G.find_edge(begin, step).get_weight();
-    //     begin = step;  // Take a step forward
-    //     std::cout << "Step to: " << step.val << std::endl;
-    //     std::this_thread::sleep_for(std::chrono::seconds(2));
-    //     i++;
-    // }
-    // auto end2 = std::chrono::high_resolution_clock::now();
-    // auto duration2 = duration_cast<std::chrono::microseconds>(end2 - start2).count();
+    begin = std::get<0>(vertex_pair);
+    end = std::get<1>(vertex_pair);
+    auto start2 = std::chrono::high_resolution_clock::now();
+    while (begin != end) {
+        std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
+        tup = G.Parallel_A_Star(begin, end);
+        dist = std::get<0>(tup);
+        prev = std::get<1>(tup);
+        path = get_and_print_path(prev, begin.val, end.val);
+        G.show_solution(prev, begin.val, end.val, i); 
+        step = G.get_vertex(path[1]);
+        total += G.find_edge(begin, step).get_weight();
+        begin = step;  // Take a step forward
+        std::cout << "Step to: " << step.val << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        i++;
+    }
+    auto end2 = std::chrono::high_resolution_clock::now();
+    auto duration2 = duration_cast<std::chrono::microseconds>(end2 - start2).count();
 
     std::cout << "Seriel took " << duration1 << " microseconds\n";
-    // std::cout << "Parallel took " << duration2 << " microseconds\n";
+    std::cout << "Parallel took " << duration2 << " microseconds\n";
 
     
     

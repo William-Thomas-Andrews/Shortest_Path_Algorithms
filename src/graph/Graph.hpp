@@ -72,13 +72,13 @@ class Graph {
 
         void reweight(Edge& edge, Vertex leading_vertex, Vertex end);
 
-        void auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, UnionFind& union_set);
+        void auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, std::vector<int>& visited);
         
-        std::tuple<std::vector<double>, std::vector<int>, int> Seriel_A_Star(Vertex v, Vertex end);
+        std::tuple<std::vector<double>, std::vector<int>, int> Seriel_A_Star(Vertex start, Vertex end);
 
-        std::tuple<std::vector<double>, std::vector<int>> Parallel_A_Star(Vertex v, Vertex end);
+        std::tuple<std::vector<double>, std::vector<int>, int> Parallel_A_Star(Vertex start, Vertex end);
 
-        void Auxiliary_Dijkstra(Vertex v, Vertex end, std::vector<int>& prev, UnionFind& union_set);
+        void Auxiliary_Dijkstra(Vertex v, Vertex end, std::vector<int>& prev, std::vector<int>& visited);
         
         friend std::ostream& operator<<(std::ostream& os, Graph& G);
 };
