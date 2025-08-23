@@ -17,6 +17,8 @@ class Graph {
         std::vector<Vertex> stored_vertices;
         UnionFind union_vertices;
         std::vector<Edge> solution_edges;
+        std::vector<Edge> thread_solution_edges;
+        std::vector<Edge> path_edges;
         std::vector<Vertex> ordered_vertices;
         Matrix adjacency_matrix;
 
@@ -36,15 +38,17 @@ class Graph {
 
         std::tuple<Vertex, Vertex> get_random_vertex_pair();
 
-        std::vector<Edge> get_solution_edges();
+        std::vector<Edge>& get_solution_edges();
+
+        std::vector<Edge>& get_thread_solution_edges();
 
         void clear_solution();
 
         void add_element(Edge e);
 
-        void show_solution(const std::vector<int>& prev, int begin, int end);
+        void show_solution(int begin, int end);
 
-        void show_solution(const std::vector<int>& prev, int begin, int end, int iteration);
+        void show_solution(int begin, int end, int iteration);
 
         void write_solution(const std::vector<int>& prev, int begin, int end);
 
@@ -52,7 +56,11 @@ class Graph {
 
         bool is_solution_edge(Edge edge);
 
+        bool is_thread_solution_edge(Edge edge);
+
         Edge find_edge(Vertex v1, Vertex v2);
+
+        Edge find_edge(int v1, int v2);
 
         std::vector<Edge>& get_data();
 
@@ -71,14 +79,12 @@ class Graph {
         void heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end);
 
         void reweight(Edge& edge, Vertex leading_vertex, Vertex end);
-
-        void auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, std::vector<int>& visited);
         
-        std::tuple<std::vector<double>, std::vector<int>, int> Seriel_A_Star(Vertex start, Vertex end);
+        void Seriel_A_Star(Vertex start, Vertex end);
 
-        std::tuple<std::vector<double>, std::vector<int>, int> Parallel_A_Star(Vertex start, Vertex end);
+        void Parallel_A_Star(Vertex start, Vertex end);
 
-        void Auxiliary_Dijkstra(Vertex v, Vertex end, std::vector<int>& prev, std::vector<int>& visited);
+        // void Auxiliary_Dijkstra(Vertex v, Vertex end, std::vector<std::atomic<int>>& prev, std::vector<std::atomic<int>>& visited);
         
         friend std::ostream& operator<<(std::ostream& os, Graph& G);
 };

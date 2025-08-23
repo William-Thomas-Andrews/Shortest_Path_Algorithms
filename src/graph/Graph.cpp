@@ -7,6 +7,7 @@
 #include <format>
 #include <thread>
 #include <tuple>
+#include <atomic>
 
 #include "Graph.hpp"
 
@@ -107,7 +108,9 @@ std::tuple<Vertex, Vertex> Graph::get_random_vertex_pair() {
     return {v1, v2};
 }
 
-std::vector<Edge> Graph::get_solution_edges() { return solution_edges; }
+std::vector<Edge>& Graph::get_solution_edges() { return solution_edges; }
+
+std::vector<Edge>& Graph::get_thread_solution_edges() { return thread_solution_edges; }
 
 void Graph::clear_solution() { solution_edges.clear(); }
 
@@ -118,7 +121,8 @@ void Graph::add_element(Edge e) {
     adj[e.get_destination().val].push_back(e);
 }
 
-void Graph::show_solution(const std::vector<int>& prev, int begin, int end) {
+
+void Graph::show_solution(int begin, int end) {
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
     graph_viz_file.open("../img_gen/g.gv");
@@ -147,7 +151,7 @@ void Graph::show_solution(const std::vector<int>& prev, int begin, int end) {
     system("neato -n2 -Tpng ../img_gen/g.gv -o ../img_gen/file1.png ; open ../img_gen/file1.png");
 }
 
-void Graph::show_solution(const std::vector<int>& prev, int begin, int end, int iteration) {
+void Graph::show_solution(int begin, int end, int iteration) {
     system(std::format("rm ../img_gen/g{}.gv ; rm ../img_gen/file{}.png", iteration, iteration).c_str());
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
@@ -161,6 +165,7 @@ void Graph::show_solution(const std::vector<int>& prev, int begin, int end, int 
         else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
         color = "black";
         if (is_solution_edge(edge)) { color = "red"; }
+        else if (is_thread_solution_edge(edge)) { color = "blue"; }
         v1_shade_str = "", v2_shade_str ="";
         if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
@@ -173,6 +178,7 @@ void Graph::show_solution(const std::vector<int>& prev, int begin, int end, int 
     graph_viz_file.close();
 
     solution_edges.clear();
+    thread_solution_edges.clear();
 
     // system(std::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
     system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
@@ -238,9 +244,26 @@ bool Graph::is_solution_edge(Edge edge) {
     return false;
 }
 
+bool Graph::is_thread_solution_edge(Edge edge) {
+    for (Edge e : path_edges) {
+        if (e == edge) { return true; }
+    }
+    std::cout << edge << std::endl;
+    return false;
+}
+
 Edge Graph::find_edge(Vertex v1, Vertex v2) {
     for (Edge& e : adj[v1.val]) {
-        if (e.get_source() == v2 or e.get_destination() == v2) {
+        if (e.get_source() == v1 and e.get_destination() == v2) {
+            return e;
+        }
+    }
+    return Edge();
+}
+
+Edge Graph::find_edge(int v1, int v2) {
+    for (Edge& e : adj[v1]) {
+        if (e.get_source().val == v1 and e.get_destination().val == v2) {
             return e;
         }
     }
@@ -280,6 +303,7 @@ Vertex Graph::get_vertex(int index) {
     return Vertex();
 }
 
+
 const std::vector<Vertex>& Graph::get_vertices() {
     return ordered_vertices;
 }
@@ -300,18 +324,17 @@ void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
 
 
 
-std::tuple<std::vector<double>, std::vector<int>, int> Graph::Seriel_A_Star(Vertex start, Vertex end) {
+void Graph::Seriel_A_Star(Vertex start, Vertex end) {
 
     solution_edges.clear();
+    thread_solution_edges.clear();
+    path_edges.clear();
     
     int sum = 0;
     double inf = 1.0 / 0.0; 
     std::vector<double> dist(adj.size(), inf);
     std::vector<int> prev(adj.size(), -1);
 
-    // Contains previous wedges and their weights for adding to 'count' variable // Actually not needed if you use dist and prev
-    // std::vector<std::tuple<Weighted_Edge, double>> prev_edges(G.V(), std::tuple<Weighted_Edge, double>());
-
     // Update with starting vertex
     dist[start.val] = 0; // update dist
     prev[start.val] = start.val; // update prev
@@ -320,250 +343,46 @@ std::tuple<std::vector<double>, std::vector<int>, int> Graph::Seriel_A_Star(Vert
     auto compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
     std::priority_queue<Edge, std::vector<Edge>, decltype(compare)> pq(compare);
 
-    // A visited set for partitioning. Entries are 0 for not visited, and 1 for visited.
-    std::vector<int> visited(adj.size(), 0);
+    std::vector<int> visited(adj.size(), 0); // A visited set for partitioning. Entries are 0 for not visited, and 1 for visited.
     visited[start.val] = 1;
 
-    // A set of used vertices
-    std::vector<Vertex> pivot_vertices = {start};
+    std::vector<Vertex> pivot_vertices = {start}; // A set of used vertices
 
-    // Iterate through number of 'turns'
-    for (int i = 0; i < adj.size()-1; i++) {
-        // Iterate through pivot (used) vertices
-        for (Vertex pivot_vertex : pivot_vertices) {
-            // Iterate through options per pivot vertex
-            for (auto edge : adj[pivot_vertex.val]) {
-                // If this edge is not directed towards the pivot and the new vertex has not already been visited
-                if (edge.get_destination() != pivot_vertex and visited[edge.get_destination().val] == 0) {
-                    // If the distance can be improved
-                    if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) {
-                        // Then update the dist vector with new dist
-                        dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight());
-                    }
-                    // Update dist vector with old dist + weight
-                    Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]);
-                    // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
-                    heuristic_reweight(new_edge, new_edge.get_destination(), end);
-                    // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
-                    // Then push it to the queue
-                    pq.push(new_edge);
-                }
-            }
-        }
-
-        if (pq.empty()) { 
-            // show_solution();
-            std::cout << "Adj size: " << adj.size() << std::endl;
-            return std::tuple(dist, prev, sum); 
-        }
-
-        // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
-        Edge best = pq.top(); pq.pop();
-        solution_edges.push_back(best);
-        // std::cout << "=======We chose the best: " << best << std::endl;
-        prev[best.get_destination().val] = best.get_source().val;
-        visited[best.get_destination().val] = 1;
-        sum += best.get_weight();
-
-        // Add to the used vertices
-        pivot_vertices.push_back(best.get_destination());
-
-        // If vertex found:
-        if (visited[end.val] == visited[best.get_destination().val]) { 
-            std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !! :O" << std::endl;
-            break;
-        }
-
-        // And if vertex not found, pop the rest of the edges out
-        while (!pq.empty()) {
-            pq.pop();
-            if (pq.size() > adj.size()) return std::tuple(dist, prev, sum);
-        }
-
-        // and repeat~
-    }
-    
-    return std::tuple(dist, prev, sum);
-}
-
-
-
-void Graph::auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, std::vector<int>& visited) {
-    // Perform Dijkstra but this time with edges facing away from the end point
-    Auxiliary_Dijkstra(v, end, prev, visited);
-    // Use a new solution set and stuff
-    // Serial A_Star should check to see if this newly added edge connects to the auxiliary set of edges (unionfind)
-        // if so, then the A_Star function adds those edges and returns what it usually does.
-}
-
-
-
-
-std::tuple<std::vector<double>, std::vector<int>, int> Graph::Parallel_A_Star(Vertex start, Vertex end) {
-
-    solution_edges.clear();
-
-    int sum = 0;
-    double inf = 1.0/ 0.0; 
-    std::vector<double> dist(adj.size(), inf);
-    std::vector<int> prev(adj.size(), -1);
-
-    // Contains previous wedges and their weights for adding to 'count' variable // Actually not needed if you use dist and prev
-    // std::vector<std::tuple<Weighted_Edge, double>> prev_edges(G.V(), std::tuple<Weighted_Edge, double>());
-
-    // Update with starting vertex
-    dist[start.val] = 0; // update dist
-    prev[start.val] = start.val; // update prev
-
-    // The minimum priority queue pq stores the edges by edge weight.
-    auto compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
-    std::priority_queue<Edge, std::vector<Edge>, decltype(compare)> pq(compare);
-
-    // A visited set for partitioning. Entries are 0 for not visited, and 1 for visited.
-    std::vector<int> visited(adj.size(), 0);
-    visited[start.val] = 1;
-
-    // A set of used vertices
-    std::vector<Vertex> pivot_vertices = {start};
-
-    // Start auxilary search (a search from the endpoint)
-    std::thread t1( [&]() { Auxiliary_Dijkstra(start, end, prev, visited); } );
-    
-    // Iterate through number of 'turns'
-    for (int i = 0; i < adj.size()-1; i++) {
-        // Iterate through pivot (used) vertices
-        for (Vertex pivot_vertex : pivot_vertices) {
-            // Iterate through options per pivot vertex
-            for (auto edge : adj[pivot_vertex.val]) {
-                // If this edge is not directed towards the pivot and the new vertex has not already been visited
-                if (edge.get_destination() != pivot_vertex and visited[edge.get_destination().val] == 0) {
-                    // If the distance can be improved
-                    if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) {
-                        // Then update the dist vector with new dist
-                        dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight());
-                    }
-                    // Update dist vector with old dist + weight
-                    Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]);
-                    // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
-                    heuristic_reweight(new_edge, new_edge.get_destination(), end);
-                    // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
-                    // Then push it to the queue
-                    pq.push(new_edge);
-                }
-            }
-        }
-
-        if (pq.empty()) { 
-            // show_solution();
-            std::cout << "Adj size: " << adj.size() << std::endl;
-            t1.join();
-            for (int v : prev) {
-                std::cout << "path" << v << " " << std::endl;
-            }
-            return std::tuple(dist, prev, sum); 
-        }
-
-        // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
-        Edge best = pq.top(); pq.pop();
-        solution_edges.push_back(best);
-        // std::cout << "=======We chose the best: " << best << std::endl;
-        prev[best.get_destination().val] = best.get_source().val;
-        visited[best.get_destination().val] = 1;
-        sum += best.get_weight();
-
-        // Add to the used vertices
-        pivot_vertices.push_back(best.get_destination());
-
-        // If vertex is found
-        if (visited[best.get_destination().val] == 2) { 
-            t1.join();
-            std::cout << "heree" << std::endl;
-            return std::tuple(dist, prev, sum); // Then we have connected the two partitions
-        }
-
-        // And if vertex not found, pop the rest of the edges out
-        while (!pq.empty()) {
-            pq.pop();
-            if (pq.size() > adj.size()) { std::cout << "Here " << std::endl; t1.join(); return std::tuple(dist, prev, sum); }// { t1.join(); return std::tuple(dist, prev, sum); }
-        }
-
-        // and repeat~
-    }
-    t1.join();
-    // for (auto x : visited) {
-    //     std::cout << x << std::endl;
-    // }
-    std::cout << "now here " << std::endl;
-    return std::tuple(dist, prev, sum);
-}
-
-
-
-
-void Graph::Auxiliary_Dijkstra(Vertex start, Vertex end, std::vector<int>& prev, std::vector<int>& visited) {
-
-    solution_edges.clear();
-
-    std::cout << "hereee" << std::endl;
-    double inf = 1.0/ 0.0; 
-    std::vector<double> dist(adj.size(), inf);
-
-    // Update with starting vertex
-    // dist[start.val] = 0; // update dist
-    // prev[start.val] = start.val; // update prev
-
-    // The minimum priority queue pq stores the edges by edge weight.
-    auto compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
-    std::priority_queue<Edge, std::vector<Edge>, decltype(compare)> pq(compare);
-
-    // A set of used vertices
-    std::vector<Vertex> pivot_vertices = {end};
-    // Iterate through number of 'turns'
-    for (int i = 0; i < adj.size()-1; i++) {
-        // Iterate through pivot (used) vertices
-        for (Vertex pivot_vertex : pivot_vertices) {
-            // Iterate through options per pivot vertex
-            for (auto edge : adj[pivot_vertex.val]) {
-                // If this edge is not directed towards the pivot and the new vertex has not already been visited
-                if (edge.get_source() != pivot_vertex and visited[edge.get_source().val] == 0) {
-                    // If the distance can be improved
-                    if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) {
+    for (int i = 0; i < adj.size()-1; i++) { // Iterate through number of 'turns'
+        for (Vertex pivot_vertex : pivot_vertices) { // Iterate through pivot (used) vertices
+            for (auto edge : adj[pivot_vertex.val]) { // Iterate through options per pivot vertex
+                if (edge.get_destination() != pivot_vertex and visited[edge.get_destination().val] == 0) { // If this edge is not directed towards the pivot and the new vertex has not already been visited
+                    if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) { // If the distance can be improved
                         dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight()); // Then update the dist vector with new dist
                     }
-                    // Update dist vector with old dist + weight
-                    Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]);
-                    // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
-                    reweight(new_edge, new_edge.get_source(), end);
-                    // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
+                    Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]); // Update dist vector with old dist + weight
+                    heuristic_reweight(new_edge, new_edge.get_destination(), end);
                     pq.push(new_edge); // Then push it to the queue
                 }
             }
         }
 
         if (pq.empty()) { 
-            // show_solution();
-            std::cout << "Adj size: " << adj.size() << std::endl;
             return; 
         }
 
-        // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
-        Edge best = pq.top(); pq.pop();
-        // solution_edges.push_back(best);
+        
+        Edge best = pq.top(); pq.pop(); // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
+        solution_edges.push_back(best);
         // std::cout << "=======We chose the best: " << best << std::endl;
         prev[best.get_destination().val] = best.get_source().val;
-        visited[best.get_destination().val] = 2;
+        visited[best.get_destination().val] = 1;
+        sum += best.get_weight();
 
-        // Add to the used vertices
-        pivot_vertices.push_back(best.get_destination());
+        pivot_vertices.push_back(best.get_destination()); // Add to the used vertices
 
-        // If vertex found:
-        if (visited[best.get_source().val] == 1) { 
-            prev[best.get_destination().val] = best.get_source().val; // Algorithm is complete
-            return;
+        
+        if (visited[end.val] == visited[best.get_destination().val]) {  // If vertex found:
+            std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !!" << std::endl;
+            break;
         }
 
-        // And if vertex not found, pop the rest of the edges out
-        while (!pq.empty()) {
+        while (!pq.empty()) { // And if vertex not found, pop the rest of the edges out
             pq.pop();
             if (pq.size() > adj.size()) return;
         }
@@ -573,6 +392,184 @@ void Graph::Auxiliary_Dijkstra(Vertex start, Vertex end, std::vector<int>& prev,
     
     return;
 }
+
+
+void Graph::Parallel_A_Star(Vertex start, Vertex end) {
+
+    solution_edges.clear();
+    thread_solution_edges.clear();
+    path_edges.clear();
+
+    int sum = 0;
+    double inf = 1.0/ 0.0; 
+    std::vector<int> prev(adj.size(), -1);
+    std::vector<double> dist(adj.size(), inf);
+    std::vector<double> thread_dist(adj.size(), inf);
+    prev[start.val] = start.val;
+    dist[start.val] = 0;
+    thread_dist[end.val] = 0;
+
+    std::vector<Vertex> thread_forward(adj.size());
+
+    // The minimum priority queue pq stores the edges by edge weight.
+    auto compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
+    std::priority_queue<Edge, std::vector<Edge>, decltype(compare)> pq(compare);
+    std::priority_queue<Edge, std::vector<Edge>, decltype(compare)> final_pq(compare);
+
+    // A visited set for partitioning. Entries are 0 for not visited, and 1 for visited.
+    std::vector<std::atomic<int>> visited(adj.size());
+    for (auto& x : visited) { x.store(0); }
+    visited[start.val] = 1;
+    visited[end.val] = 2;
+
+    // A set of used vertices
+    std::vector<Vertex> pivot_vertices = {start};
+    std::vector<Vertex> thread_pivot_vertices = {end};
+
+    int connections = 0;
+
+    double min_thread_dist = inf;
+
+
+    // Begin thread: Start auxilary search (a search from the endpoint) -------------------------------------------------
+    std::thread t1( [&]() { 
+        
+        // The minimum priority queue pq stores the edges by edge weight.
+        auto thread_compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
+        std::priority_queue<Edge, std::vector<Edge>, decltype(thread_compare)> thread_pq(thread_compare);
+
+        for (int i = 0; i < adj.size()-1; i++) {  // Iterate through number of 'turns'
+            for (Vertex thread_pivot_vertex : thread_pivot_vertices) { // Iterate through pivot (used) vertices
+                for (auto edge : adj[thread_pivot_vertex.val]) { // Iterate through options per pivot vertex
+                    if (edge.get_source() != thread_pivot_vertex and visited[edge.get_source().val] != 2) { // If this edge is not directed towards the pivot and the new vertex has not already been visited by this thread
+                        if (thread_dist[edge.get_other(thread_pivot_vertex).val] > (thread_dist[thread_pivot_vertex.val] + edge.get_weight())) { // If the distance can be improved
+                            thread_dist[edge.get_other(thread_pivot_vertex).val] = (thread_dist[thread_pivot_vertex.val] + edge.get_weight()); // Then update the dist vector with new dist
+                            if (thread_dist[edge.get_other(thread_pivot_vertex).val] < min_thread_dist) {
+                                min_thread_dist = thread_dist[edge.get_other(thread_pivot_vertex).val];
+                            }
+                        }
+                        Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+thread_dist[thread_pivot_vertex.val]); // Update dist vector with old dist + weight
+                        thread_pq.push(new_edge); // Then push it to the queue
+                    }
+                }
+            }
+
+            if (thread_pq.empty()) { 
+                std::cout << "Adj size: " << adj.size() << std::endl;
+                return; 
+            }
+
+            // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
+            Edge best = thread_pq.top(); thread_pq.pop();
+            std::cout << "=======Thread chose the best: \n\n" << best << std::endl;
+            // prev[best.get_destination().val] = best.get_source().val;
+            thread_forward[best.get_source().val] = best.get_destination();
+            thread_solution_edges.push_back(best); // not yet
+
+            if (visited[best.get_source().val].load() == 1) { 
+                connections++;
+               if (connections > adj.size() / 20) return;
+            }
+
+            visited[best.get_source().val] = 2;
+            
+            thread_pivot_vertices.push_back(best.get_source()); // Add to the used vertices
+
+            
+            if (visited[best.get_source().val] == 1) {  // If vertex found:
+                prev[best.get_destination().val] = best.get_source().val; // Algorithm is complete
+                return;
+            }
+
+            
+            while (!thread_pq.empty()) { // And if vertex not found, pop the rest of the edges out
+                thread_pq.pop();
+                if (thread_pq.size() > adj.size()) return;
+            }
+
+            // and repeat~
+        }
+        return;
+    } );
+    // End thread ----------------------------------------------------------------------------------------------
+    
+
+    for (int i = 0; i < adj.size()-1; i++) {  // Iterate through number of 'turns'
+        for (Vertex pivot_vertex : pivot_vertices) { // Iterate through pivot (used) vertices
+            for (auto edge : adj[pivot_vertex.val]) { // Iterate through options per pivot vertex
+                if (edge.get_destination() != pivot_vertex and visited[edge.get_destination().val] != 1) { // If this edge is not directed towards the pivot and the new vertex has not already been visited
+                    if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) { // If the distance can be improved
+                        dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight()); // Then update the dist vector with new dist
+                    }
+                    Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]); // Update dist vector with old dist + weight
+                    heuristic_reweight(new_edge, new_edge.get_destination(), end);
+                    pq.push(new_edge); // Then push it to the queue
+                }
+            }
+        }
+
+        if (pq.empty()) { 
+            t1.join(); return; 
+        }
+
+        
+        Edge best = pq.top(); pq.pop(); // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
+        solution_edges.push_back(best);
+        std::cout << "=======Main chose the best: \n\n" << best << std::endl;
+        prev[best.get_destination().val] = best.get_source().val;
+
+        if (visited[best.get_destination().val].load() == 2) { // If vertex is found
+            t1.join();
+            for (auto e : solution_edges) {
+                if (visited[e.get_destination().val].load() == 2) {
+                    Edge temp_edge = Edge(e.get_source(), e.get_destination(), e.get_weight() + thread_dist[e.get_destination().val]);
+                    final_pq.push(temp_edge);
+                }
+            }
+
+            Edge connector_edge = final_pq.top(); final_pq.pop();
+            // Append prev 
+            for (int at = connector_edge.get_source().val; at != start.val && at != -1; at = prev[at]) {
+                path_edges.push_back(find_edge(prev[at], at));
+            }
+            std::reverse(path_edges.begin(), path_edges.end());
+            // Append forward
+            for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
+                path_edges.push_back(find_edge(at, thread_forward[at].val));
+            }
+            std::cout << "min_thread_dist: " << min_thread_dist << std::endl;
+            for (auto& x : visited) {
+                std::cout << "Visited: " << x << std::endl;
+            }
+            return; // Then we have connected the two partitions
+        }
+
+        visited[best.get_destination().val] = 1;
+        sum += best.get_weight();
+        
+        pivot_vertices.push_back(best.get_destination()); // Add to the used vertices
+
+        while (!pq.empty()) { // And if vertex not found, pop the rest of the edges out
+            pq.pop();
+            if (pq.size() > adj.size()) { 
+                t1.join(); return; 
+            } 
+        }
+
+        // and repeat~
+    }
+    t1.join();
+    // int m = 0;
+    // for (auto& x : visited) {
+    //     std::cout << m << " Visited: " << x << std::endl;
+    //     m++;
+    // }
+    return;
+}
+
+
+
+
 
 
 std::ostream& operator<<(std::ostream& os, Graph& G) {

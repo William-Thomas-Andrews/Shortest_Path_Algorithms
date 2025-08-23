@@ -238,22 +238,22 @@ void GNN::update_params() {
 
 
 void GNN::update_Y(Vertex start, Vertex end) { 
-    Y.clear();
-    std::tuple<std::vector<double>, std::vector<int>, int> tup = G.Seriel_A_Star(start, end);
-    std::vector<double> dist = std::get<0>(tup);
-    std::vector<int> prev = std::get<1>(tup);
-    std::vector<int> path = get_and_print_path(prev, start.val, end.val);
-    // update Y to be the adjacency matrix 
+    // Y.clear();
+    // // std::tuple<std::vector<double>, std::vector<int>, int> tup = G.Seriel_A_Star(start, end);
+    // // std::vector<double> dist = std::get<0>(tup);
+    // // std::vector<int> prev = std::get<1>(tup);
+    // // std::vector<int> path = get_and_print_path(prev, start.val, end.val);
+    // // update Y to be the adjacency matrix 
+    // // for (int i = 0; i < path.size()-1; i++) {
+    // //     Y(path[i], path[i+1]) = 1;
+    // // }
     // for (int i = 0; i < path.size()-1; i++) {
-    //     Y(path[i], path[i+1]) = 1;
+    //     int row_index = path[i];
+    //     int col_index = path[i+1];
+    //     int index = (row_index * 45) + col_index;
+    //     Y(index, 0) = 1.0;
+    //     // std::cout << index << std::endl;
     // }
-    for (int i = 0; i < path.size()-1; i++) {
-        int row_index = path[i];
-        int col_index = path[i+1];
-        int index = (row_index * 45) + col_index;
-        Y(index, 0) = 1.0;
-        // std::cout << index << std::endl;
-    }
 
 }
 
