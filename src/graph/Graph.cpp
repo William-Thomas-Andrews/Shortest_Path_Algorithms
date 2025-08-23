@@ -110,7 +110,7 @@ std::tuple<Vertex, Vertex> Graph::get_random_vertex_pair() {
 
 std::vector<Edge>& Graph::get_solution_edges() { return solution_edges; }
 
-std::vector<Edge>& Graph::get_thread_solution_edges() { return thread_solution_edges; }
+std::vector<Edge>& Graph::get_thread_solution_edges() { return path_edges; }
 
 void Graph::clear_solution() { solution_edges.clear(); }
 
@@ -400,6 +400,11 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
     thread_solution_edges.clear();
     path_edges.clear();
 
+    // If the start is right next to the end, then quickly get it and return
+    // if (find_edge(start, end)) {
+    //     path_edges.push_back()
+    // }
+
     int sum = 0;
     double inf = 1.0/ 0.0; 
     std::vector<int> prev(adj.size(), -1);
@@ -522,7 +527,7 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
             t1.join();
             for (auto e : solution_edges) {
                 if (visited[e.get_destination().val].load() == 2) {
-                    Edge temp_edge = Edge(e.get_source(), e.get_destination(), e.get_weight() + thread_dist[e.get_destination().val]);
+                    Edge temp_edge = Edge(e.get_source(), e.get_destination(), dist[e.get_source().val] + thread_dist[e.get_destination().val]); //e.get_weight() + thread_dist[e.get_destination().val]);
                     final_pq.push(temp_edge);
                 }
             }

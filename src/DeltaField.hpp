@@ -12,5 +12,5 @@ class DeltaField {
 
         int activate_A_Star();
 
-        int activate_neural_network();
+        // int activate_neural_network();
 };

@@ -81,12 +81,8 @@ int DeltaField::activate_A_Star() {
         std::cout << "Start: " << begin2.val << ", and end at: " << end2.val << std::endl;
         G.Parallel_A_Star(begin2, end2);
         path2.push_back(begin2);
-        for (auto z : G.get_solution_edges()) {
+        for (auto z : G.get_thread_solution_edges()) {
             path2.push_back(z.get_destination());
-        }
-        for (auto z1 : G.get_thread_solution_edges()) {
-            // if (z1.get)
-            path2.push_back(z1.get_destination());
         }
         std::cout << "two " << std::endl;
         G.show_solution(begin2.val, end2.val, i); 
@@ -106,29 +102,11 @@ int DeltaField::activate_A_Star() {
     std::cout << "Seriel took " << duration1 << " microseconds\n";
     std::cout << "Parallel took " << duration_2 << " microseconds\n";
 
-    
-    
 
     std::cout << "Done with the Delta Field!" << std::endl;
 
     G.show_solution(begin2.val, end2.val, i);
-    std::cout << "hereeeeeee" << std::endl;
 
     return total;
 
-}
-
-int DeltaField::activate_neural_network() {
-    // std::cout << G << std::endl;
-    Neural_Network = GNN(G, 0.01);
-    Neural_Network.train(1000);
-    Vertex v1 = G.get_vertex(1);
-    Vertex v2 = G.get_vertex(10);
-    Neural_Network.predict(v1, v2);
-    std::cout << "\nsepararse \n\n" << std::endl;
-    v1 = G.get_vertex(3);
-    v2 = G.get_vertex(24);
-    Neural_Network.predict(v1, v2);
-    std::cout << "wii made it " << std::endl;
-    return 0;
 }
