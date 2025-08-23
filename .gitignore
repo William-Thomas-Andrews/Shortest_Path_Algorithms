@@ -48,13 +48,5 @@ Makefile
 *.swo
 
 
-GlobalExecutor.cpp.o
-Benchmark.cpp.o
-ObserverManager.cpp.o
-RegexMatchCache.cpp.o
-libfollybenchmark.a
-JSONSchema.cpp.o
-logging_example
-compiler_depend.make
-compiler_depend.internal
-libfolly.a
+# ---- Deprecated folders ----
+neural_net

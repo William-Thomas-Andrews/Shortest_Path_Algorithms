@@ -173,12 +173,12 @@ void Graph::show_solution(int begin, int end, int iteration) {
         graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
         graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
-    std::cout << solution_edges.size();
+    // std::cout << solution_edges.size();
     graph_viz_file << "}";
     graph_viz_file.close();
 
-    solution_edges.clear();
-    thread_solution_edges.clear();
+    // solution_edges.clear();
+    // thread_solution_edges.clear();
 
     // system(std::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
     system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
@@ -240,7 +240,7 @@ bool Graph::is_solution_edge(Edge edge) {
     for (Edge e : solution_edges) {
         if (e == edge) { return true; }
     }
-    std::cout << edge << std::endl;
+    // std::cout << edge << std::endl;
     return false;
 }
 
@@ -248,7 +248,7 @@ bool Graph::is_thread_solution_edge(Edge edge) {
     for (Edge e : path_edges) {
         if (e == edge) { return true; }
     }
-    std::cout << edge << std::endl;
+    // std::cout << edge << std::endl;
     return false;
 }
 
@@ -538,6 +538,7 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
                 path_edges.push_back(find_edge(prev[at], at));
             }
             std::reverse(path_edges.begin(), path_edges.end());
+            path_edges.push_back(connector_edge);
             // Append forward
             for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
                 path_edges.push_back(find_edge(at, thread_forward[at].val));
@@ -564,11 +565,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
         // and repeat~
     }
     t1.join();
-    // int m = 0;
-    // for (auto& x : visited) {
-    //     std::cout << m << " Visited: " << x << std::endl;
-    //     m++;
-    // }
     return;
 }
 
