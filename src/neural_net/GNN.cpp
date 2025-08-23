@@ -239,7 +239,7 @@ void GNN::update_params() {
 
 void GNN::update_Y(Vertex start, Vertex end) { 
     Y.clear();
-    std::tuple<std::vector<double>, std::vector<int>> tup = G.Seriel_A_Star(start, end);
+    std::tuple<std::vector<double>, std::vector<int>, int> tup = G.Seriel_A_Star(start, end);
     std::vector<double> dist = std::get<0>(tup);
     std::vector<int> prev = std::get<1>(tup);
     std::vector<int> path = get_and_print_path(prev, start.val, end.val);

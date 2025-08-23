@@ -14,7 +14,7 @@ int DeltaField::activate_A_Star() {
     Vertex begin, end, step;
     std::string file_path;
     std::tuple<Vertex, Vertex> vertex_pair; 
-    std::tuple<std::vector<double>, std::vector<int>> tup;
+    std::tuple<std::vector<double>, std::vector<int>, int> tup;
     std::vector<double> dist;
     std::vector<int> prev;
     std::vector<int> path;
@@ -28,12 +28,14 @@ int DeltaField::activate_A_Star() {
     system("killall Preview ; rm -rf ../img_gen/* "); // The Preview process is the default pdf/image viewer app for macOS
 
     // // Time function1
+    int sum = 0;
     auto start1 = std::chrono::high_resolution_clock::now();
     while (begin != end) {
         std::cout << "Start: " << begin.val << ", and end at: " << end.val << std::endl;
         tup = G.Seriel_A_Star(begin, end);
         dist = std::get<0>(tup);
         prev = std::get<1>(tup);
+        sum += std::get<2>(tup);
         path = get_and_print_path(prev, begin.val, end.val);
         G.show_solution(prev, begin.val, end.val, i); 
         step = G.get_vertex(path[1]);
@@ -45,6 +47,7 @@ int DeltaField::activate_A_Star() {
     }
     auto end1 = std::chrono::high_resolution_clock::now();
     auto duration1 = duration_cast<std::chrono::microseconds>(end1 - start1).count();
+    std::cout << "Sum1: " << total << std::endl;
 
     // Time function2
     // begin = std::get<0>(vertex_pair);

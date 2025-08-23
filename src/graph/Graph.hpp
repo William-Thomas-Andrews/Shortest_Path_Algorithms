@@ -74,7 +74,7 @@ class Graph {
 
         void auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, UnionFind& union_set);
         
-        std::tuple<std::vector<double>, std::vector<int>> Seriel_A_Star(Vertex v, Vertex end);
+        std::tuple<std::vector<double>, std::vector<int>, int> Seriel_A_Star(Vertex v, Vertex end);
 
         std::tuple<std::vector<double>, std::vector<int>> Parallel_A_Star(Vertex v, Vertex end);
 

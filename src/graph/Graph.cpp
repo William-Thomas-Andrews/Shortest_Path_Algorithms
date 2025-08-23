@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <format>
 #include <thread>
+#include <tuple>
 
 #include "Graph.hpp"
 
@@ -297,10 +298,11 @@ void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
     edge.set_weight(edge.get_weight());
 }
 
-std::tuple<std::vector<double>, std::vector<int>> Graph::Seriel_A_Star(Vertex start, Vertex end) {
+std::tuple<std::vector<double>, std::vector<int>, int> Graph::Seriel_A_Star(Vertex start, Vertex end) {
 
     solution_edges.clear();
-
+    
+    int sum = 0;
     double inf = 1.0 / 0.0; 
     std::vector<double> dist(adj.size(), inf);
     std::vector<int> prev(adj.size(), -1);
@@ -350,7 +352,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::Seriel_A_Star(Vertex st
         if (pq.empty()) { 
             // show_solution();
             std::cout << "Adj size: " << adj.size() << std::endl;
-            return std::tuple(dist, prev); 
+            return std::tuple(dist, prev, sum); 
         }
 
         // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
@@ -359,6 +361,7 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::Seriel_A_Star(Vertex st
         // std::cout << "=======We chose the best: " << best << std::endl;
         prev[best.get_destination().val] = best.get_source().val;
         visited[best.get_destination().val] = 1;
+        sum += best.get_weight();
 
         // Add to the used vertices
         pivot_vertices.push_back(best.get_destination());
@@ -372,14 +375,16 @@ std::tuple<std::vector<double>, std::vector<int>> Graph::Seriel_A_Star(Vertex st
         // And if vertex not found, pop the rest of the edges out
         while (!pq.empty()) {
             pq.pop();
-            if (pq.size() > adj.size()) return std::tuple(dist, prev);
+            if (pq.size() > adj.size()) return std::tuple(dist, prev, sum);
         }
 
         // and repeat~
     }
     
-    return std::tuple(dist, prev);
+    return std::tuple(dist, prev, sum);
 }
+
+
 
 void Graph::auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, UnionFind& union_set) {
     // Perform Dijkstra but this time with edges facing away from the end point
@@ -388,6 +393,9 @@ void Graph::auxiliary_search(Vertex v, Vertex end, std::vector<int>& prev, Union
     // Serial A_Star should check to see if this newly added edge connects to the auxiliary set of edges (unionfind)
         // if so, then the A_Star function adds those edges and returns what it usually does.
 }
+
+
+
 
 std::tuple<std::vector<double>, std::vector<int>> Graph::Parallel_A_Star(Vertex v, Vertex end) {
 
