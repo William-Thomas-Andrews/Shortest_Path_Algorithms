@@ -42,7 +42,7 @@ int DeltaField::activate_A_Star() {
         total += G.find_edge(begin, step).get_weight();
         begin = step;  // Take a step forward
         std::cout << "Step to: " << step.val << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        // std::this_thread::sleep_for(std::chrono::seconds(0.1));
         i++;
     }
     auto end1 = std::chrono::high_resolution_clock::now();
@@ -58,13 +58,15 @@ int DeltaField::activate_A_Star() {
         tup = G.Parallel_A_Star(begin, end);
         dist = std::get<0>(tup);
         prev = std::get<1>(tup);
+        std::cout << "one" << std::endl;
         path = get_and_print_path(prev, begin.val, end.val);
+        std::cout << "two " << std::endl;
         G.show_solution(prev, begin.val, end.val, i); 
         step = G.get_vertex(path[1]);
         total += G.find_edge(begin, step).get_weight();
         begin = step;  // Take a step forward
         std::cout << "Step to: " << step.val << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        // std::this_thread::sleep_for(std::chrono::seconds(0));
         i++;
     }
     auto end2 = std::chrono::high_resolution_clock::now();

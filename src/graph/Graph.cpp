@@ -285,7 +285,7 @@ const std::vector<Vertex>& Graph::get_vertices() {
 }
 
 signed long Graph::potential(Vertex start, Vertex end) {
-    return std::sqrt( std::sqrt( std::pow((start.x - end.x), 2) + std::pow((start.y - end.y), 2) ) );
+    return std::sqrt( std::pow((start.x - end.x), 2) + std::pow((start.y - end.y), 2) );
 }
 
 void Graph::heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
@@ -297,6 +297,8 @@ void Graph::heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
 void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
     edge.set_weight(edge.get_weight());
 }
+
+
 
 std::tuple<std::vector<double>, std::vector<int>, int> Graph::Seriel_A_Star(Vertex start, Vertex end) {
 
@@ -443,7 +445,7 @@ std::tuple<std::vector<double>, std::vector<int>, int> Graph::Parallel_A_Star(Ve
                     // Update dist vector with old dist + weight
                     Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]);
                     // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
-                    reweight(new_edge, new_edge.get_destination(), end);
+                    heuristic_reweight(new_edge, new_edge.get_destination(), end);
                     // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
                     // Then push it to the queue
                     pq.push(new_edge);
@@ -455,10 +457,11 @@ std::tuple<std::vector<double>, std::vector<int>, int> Graph::Parallel_A_Star(Ve
             // show_solution();
             std::cout << "Adj size: " << adj.size() << std::endl;
             t1.join();
+            for (int v : prev) {
+                std::cout << "path" << v << " " << std::endl;
+            }
             return std::tuple(dist, prev, sum); 
         }
-
-
 
         // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
         Edge best = pq.top(); pq.pop();
@@ -468,26 +471,29 @@ std::tuple<std::vector<double>, std::vector<int>, int> Graph::Parallel_A_Star(Ve
         visited[best.get_destination().val] = 1;
         sum += best.get_weight();
 
-
-
         // Add to the used vertices
         pivot_vertices.push_back(best.get_destination());
 
         // If vertex is found
         if (visited[best.get_destination().val] == 2) { 
             t1.join();
-            return std::tuple(dist, prev, sum); // Then we have connected the 
+            std::cout << "heree" << std::endl;
+            return std::tuple(dist, prev, sum); // Then we have connected the two partitions
         }
-        
+
         // And if vertex not found, pop the rest of the edges out
         while (!pq.empty()) {
             pq.pop();
-            if (pq.size() > adj.size()) { t1.join(); return std::tuple(dist, prev, sum); }
+            if (pq.size() > adj.size()) { std::cout << "Here " << std::endl; t1.join(); return std::tuple(dist, prev, sum); }// { t1.join(); return std::tuple(dist, prev, sum); }
         }
 
         // and repeat~
     }
     t1.join();
+    // for (auto x : visited) {
+    //     std::cout << x << std::endl;
+    // }
+    std::cout << "now here " << std::endl;
     return std::tuple(dist, prev, sum);
 }
 
@@ -496,6 +502,9 @@ std::tuple<std::vector<double>, std::vector<int>, int> Graph::Parallel_A_Star(Ve
 
 void Graph::Auxiliary_Dijkstra(Vertex start, Vertex end, std::vector<int>& prev, std::vector<int>& visited) {
 
+    solution_edges.clear();
+
+    std::cout << "hereee" << std::endl;
     double inf = 1.0/ 0.0; 
     std::vector<double> dist(adj.size(), inf);
 
@@ -524,7 +533,7 @@ void Graph::Auxiliary_Dijkstra(Vertex start, Vertex end, std::vector<int>& prev,
                     // Update dist vector with old dist + weight
                     Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]);
                     // std::cout << new_edge << "  ~Past weight: " << new_edge.get_weight() << std::endl;
-                    reweight(new_edge, new_edge.get_destination(), end);
+                    reweight(new_edge, new_edge.get_source(), end);
                     // std::cout << "New weight: " << new_edge.get_weight() << std::endl;
                     pq.push(new_edge); // Then push it to the queue
                 }
@@ -539,7 +548,7 @@ void Graph::Auxiliary_Dijkstra(Vertex start, Vertex end, std::vector<int>& prev,
 
         // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
         Edge best = pq.top(); pq.pop();
-        solution_edges.push_back(best);
+        // solution_edges.push_back(best);
         // std::cout << "=======We chose the best: " << best << std::endl;
         prev[best.get_destination().val] = best.get_source().val;
         visited[best.get_destination().val] = 2;
