@@ -10,7 +10,7 @@ class DeltaField {
     public:
         DeltaField(Graph Graph_Input);
 
-        int activate_A_Star();
+        void activate_A_Star();
 
         void specified_standard_activation(Vertex start, Vertex end);
         void specified_standard_activation(int start_val, int end_val);
