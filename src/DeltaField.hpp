@@ -1,11 +1,10 @@
 #pragma once
 
-#include "GNN.cpp"
+#include "Graph.cpp"
 
 class DeltaField {
     private:
         Graph G;
-        GNN Neural_Network;
 
     public:
         DeltaField(Graph Graph_Input);

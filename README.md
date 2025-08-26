@@ -7,10 +7,12 @@ The goal is to explore high-performance implementations of graph routing algorit
 ## Features
 - Reads data from an easy-to-use json format with Folly.
 - Implements shortest path algorithms (e.g., Dijkstra, A*, Parallel-Bidirectional A*).  
-- The bidirectional A* algorithm uses **std::thread** to parallelize the normal A* algorithm to achieve better results than the seriel version with multithreading.
+- The bidirectional A* algorithm uses **std::thread** to parallelize the normal A* algorithm to achieve better results than the single-threaded normal version.
 - Supports directed weighted graphs.
 - Includes test cases and benchmarks.
 - Includes a C-style array-based **Matrix** class that will soon implement an adjacency matrix in the **Graph** class.
+- A detailed write-up about the algorithms and their properties with the filename **Writeup.pdf**
+
 
 ## Requirements
 - C++20 or later  
