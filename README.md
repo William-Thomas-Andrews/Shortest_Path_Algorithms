@@ -1,15 +1,16 @@
 # Shortest Path Project
 
 ## Overview
-This project implements a **shortest path algorithm** in C++ with support for efficient data structures and utilities provided by [Folly](https://github.com/facebook/folly).  
-The goal is to explore high-performance implementations of graph routing algorithms.
+This project implements multiple **shortest path algorithm** in C++ with support for efficient data structures and utilities provided by [Folly](https://github.com/facebook/folly).  
+The goal is to explore high-performance implementations of graph routing algorithms in a road transit-like simulation.
 
 ## Features
-- Implements shortest path algorithms (e.g., Dijkstra, A*).  
-- Optimized for performance using Folly containers/utilities.  
-- Supports weighted graphs (directed/undirected).  
-- Configurable input graph format (e.g., adjacency list, edge list).  
-- Includes test cases and benchmarks.  
+- Reads data from an easy-to-use json format with Folly.
+- Implements shortest path algorithms (e.g., Dijkstra, A*, Parallel-Bidirectional A*).  
+- The bidirectional A* algorithm uses **std::thread** to parallelize the normal A* algorithm to achieve better results than the seriel version with multithreading.
+- Supports directed weighted graphs.
+- Includes test cases and benchmarks.
+- Includes a C-style array-based **Matrix** class that will soon implement an adjacency matrix in the **Graph** class.
 
 ## Requirements
 - C++20 or later  
