@@ -19,8 +19,8 @@ The goal is to explore high-performance implementations of graph routing algorit
 ## Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/shortest-path-project.git
-cd shortest-path-project
+git clone https://github.com/William-Thomas-Andrews/Shortest_Path_Algorithms.git
+cd Shortest_Path_Algorithms
 
 # Build
 cd scripts/
