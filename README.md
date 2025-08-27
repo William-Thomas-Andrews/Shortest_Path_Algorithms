@@ -4,6 +4,10 @@
 This project implements multiple **shortest path algorithm** in C++ with support for efficient data structures and utilities provided by [Folly](https://github.com/facebook/folly).  
 The goal is to explore high-performance implementations of graph routing algorithms in a road transit-like simulation.
 
+## Example Multithreaded Path (red for edges the main thread found, blue for edges the auxiliary thread found)
+
+![Alt text](example.png)
+
 ## Features
 - Reads data from an easy-to-use json format with Folly.
 - Implements shortest path algorithms (e.g., Dijkstra, A*, Parallel-Bidirectional A*).  
@@ -32,6 +36,4 @@ cd scripts/
 ./run.sh
 ```
 
-## Example Multithreaded Path (red for edges the main thread found, blue for edges the auxiliary thread found)
 
-![Alt text](example.png)
