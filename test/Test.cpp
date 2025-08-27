@@ -3,7 +3,7 @@
 #include <cassert>
 #include <vector>
 #include <tuple>
-#include "TestRunner.cpp"
+#include "TestRunner.hpp"
 
 int main() {
     run_all_tests();

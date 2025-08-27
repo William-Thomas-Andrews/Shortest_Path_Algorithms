@@ -4,6 +4,8 @@
 #include <vector>
 #include <random>
 
+#include "Vertex.hpp"
+
 
 class Matrix {
     private:

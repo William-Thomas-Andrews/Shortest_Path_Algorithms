@@ -1,6 +1,6 @@
 #include <format>
 #include "TestRunner.hpp"
-#include "DeltaField.cpp"
+#include "DeltaField.hpp"
 
 
 void run_all_tests() {

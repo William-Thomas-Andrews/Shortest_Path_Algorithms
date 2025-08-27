@@ -3,9 +3,9 @@
 
 #include "folly/dynamic.h"
 #include "folly/json.h"
-#include "UnionFind.cpp"
-#include "Edge.cpp"
-#include "Matrix.cpp"
+#include "UnionFind.hpp"
+#include "Edge.hpp"
+#include "Matrix.hpp"
 
 
 // The input set for a Graphic Matroid

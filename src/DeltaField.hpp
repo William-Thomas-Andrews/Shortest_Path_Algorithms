@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Graph.cpp"
+#include "Graph.hpp"
 
 class DeltaField {
     private:

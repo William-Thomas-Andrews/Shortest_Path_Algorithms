@@ -4,8 +4,8 @@
 using Weight = signed long;
 using Coordinate = signed long;
 
-signed long max_val = 10; // Coordinate max value
-signed long min_val = -10; // Coordinate min value
+inline constexpr signed long max_val = 10; // Coordinate max value
+inline constexpr signed long min_val = -10; // Coordinate min value
 
 struct Vertex {
     int val;

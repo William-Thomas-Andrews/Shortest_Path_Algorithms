@@ -10,8 +10,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # find_package(Folly CONFIG REQUIRED) # Enable for access without relying on the folly the submodule
 find_package(gflags CONFIG REQUIRED)
 
-add_executable(
- SPG test/Test.cpp
+file(GLOB_RECURSE SRC_FILES
+    src/*.cpp
+)
+
+add_executable(SPG 
+    test/Test.cpp
+    ${SRC_FILES}
 )
 
 add_subdirectory(external/folly/)
