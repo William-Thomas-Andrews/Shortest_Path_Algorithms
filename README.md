@@ -30,3 +30,8 @@ cd scripts/
 ./configure.sh
 ./build.sh
 ./run.sh
+```
+
+## Example Multithreaded Path (red for edges the main thread found, blue for edges the auxiliary thread found)
+
+![Alt text](example.png)
