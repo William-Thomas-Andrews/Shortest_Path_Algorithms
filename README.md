@@ -15,7 +15,7 @@ The goal is to explore high-performance implementations of graph routing algorit
 - Supports directed weighted graphs.
 - Includes test cases and benchmarks.
 - Includes a C-style array-based **Matrix** class that will soon implement an adjacency matrix in the **Graph** class.
-- A detailed write-up about the algorithms and their properties with the filename **Writeup.pdf**
+- Will be incorporating a detailed write-up about the algorithms and their properties with the filename **Writeup.pdf**
 
 
 ## Requirements
