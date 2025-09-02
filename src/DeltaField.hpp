@@ -15,6 +15,7 @@ class DeltaField {
         void specified_standard_activation(int start_val, int end_val);
         void specified_multithreaded_activation(Vertex start_val, Vertex end_val);
         void specified_multithreaded_activation(int start_val, int end_val);
+        void random_dijkstra_activation();
         void random_standard_activation();
         void random_multithreaded_activation();
 

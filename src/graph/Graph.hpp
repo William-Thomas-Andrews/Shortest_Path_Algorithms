@@ -80,7 +80,9 @@ class Graph {
 
         void reweight(Edge& edge, Vertex leading_vertex, Vertex end);
         
-        void Seriel_A_Star(Vertex start, Vertex end);
+        void Serial_A_Star(Vertex start, Vertex end);
+
+        void Serial_Dijkstra(Vertex start, Vertex end);
 
         void Parallel_A_Star(Vertex start, Vertex end);
 

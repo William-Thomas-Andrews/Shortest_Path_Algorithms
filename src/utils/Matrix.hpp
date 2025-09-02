@@ -23,8 +23,6 @@ class Matrix {
         Matrix(const std::vector<Vertex>& data, int num_rows, int num_columns);
         Matrix(double* data, int data_size, int num_rows, int num_columns);
         Matrix(const Matrix& other);
-        // Matrix(Matrix&& other) noexcept;
-        // Matrix& operator=(Matrix&& other) noexcept;
         ~Matrix();
 
         // Operators

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Shortest Path Algorithms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+
+        /* Put graph+buttons on the left, description on the right */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 40px; /* space between image/buttons and description */
+            margin-top: 20px;
+        }
+
+        .graph-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #graphImage {
+            width: 800px;
+            height: 650px;
+            border: 1px solid #ccc;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .button-group button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .description {
+            max-width: 500px;
+        }
+        .description h2 {
+            margin-bottom: 10px;
+        }
+        .description p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shortest Path Algorithms Demo</h1>
+
+    <div class="main-container">
+        <!-- Left side -->
+        <div class="graph-container">
+            <img id="graphImage" src="file0.png" alt="Graph">
+            <div class="button-group">
+                <button onclick="reloadGraph(0)">Dijkstra's Algorithm</button>
+                <button onclick="reloadGraph(1)">A* (A-Star)</button>
+                <button onclick="reloadGraph(2)">Multi-Threaded A*</button>
+            </div>
+        </div>
+
+        <!-- Right side -->
+        <div class="description">
+            <h2>Project Description</h2>
+            <p>
+                This project demonstrates shortest path algorithms on a graph.
+                Click the buttons to generate an updated graph using your chosen algorithm:
+                <strong>Dijkstra</strong>, <strong>A*</strong>, or <strong>Multi-Threaded A*</strong>.
+                The image is generated dynamically from C++ programs running on the server.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function reloadGraph(index) {
+            const buttons = document.querySelectorAll("button");
+            buttons.forEach(btn => btn.disabled = true); // disable all buttons
+
+            const img = document.getElementById("graphImage");
+            fetch(`/generate_${index}`)
+                .then(() => {
+                    // Cache-busting
+                    img.src = `file${index}.png?t=${new Date().getTime()}`;
+                })
+                .catch(err => console.error(err))
+                .finally(() => {
+                    buttons.forEach(btn => btn.disabled = false);
+                });
+        }
+    </script>
+</body>
+</html>

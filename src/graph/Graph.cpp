@@ -18,6 +18,7 @@ Graph::Graph() {}
 Graph::Graph(int size) : union_set(UnionFind(size)), adj(size) {}
 Graph::Graph(std::string file_path) {
     std::cout << file_path << std::endl;
+    system("pwd");
     folly::dynamic data = parse_json(file_path);
     Vertex v1, v2;
     Weight weight;
@@ -152,7 +153,7 @@ void Graph::show_solution(int begin, int end) {
 }
 
 void Graph::show_solution(int begin, int end, int iteration) {
-    system(std::format("rm ../img_gen/g{}.gv ; rm ../img_gen/file{}.png", iteration, iteration).c_str());
+    system(std::format("rm ../img_gen/g{}.gv ; rm ../static/display{}.png", iteration, iteration).c_str());
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
     graph_viz_file.open(std::format("../img_gen/g{}.gv", iteration));
@@ -181,7 +182,8 @@ void Graph::show_solution(int begin, int end, int iteration) {
     // thread_solution_edges.clear();
 
     // system(std::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
-    system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
+    // system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
+    system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../static/display{}.png ", iteration, iteration).c_str());
 }
 
 void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
@@ -324,7 +326,7 @@ void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
 
 
 
-void Graph::Seriel_A_Star(Vertex start, Vertex end) {
+void Graph::Serial_A_Star(Vertex start, Vertex end) {
 
     solution_edges.clear();
     thread_solution_edges.clear();
@@ -357,6 +359,76 @@ void Graph::Seriel_A_Star(Vertex start, Vertex end) {
                     }
                     Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]); // Update dist vector with old dist + weight
                     heuristic_reweight(new_edge, new_edge.get_destination(), end);
+                    pq.push(new_edge); // Then push it to the queue
+                }
+            }
+        }
+
+        if (pq.empty()) { 
+            return; 
+        }
+
+        
+        Edge best = pq.top(); pq.pop(); // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
+        solution_edges.push_back(best);
+        // std::cout << "=======We chose the best: " << best << std::endl;
+        prev[best.get_destination().val] = best.get_source().val;
+        visited[best.get_destination().val] = 1;
+        sum += best.get_weight();
+
+        pivot_vertices.push_back(best.get_destination()); // Add to the used vertices
+
+        
+        if (visited[end.val] == visited[best.get_destination().val]) {  // If vertex found:
+            std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !!" << std::endl;
+            break;
+        }
+
+        while (!pq.empty()) { // And if vertex not found, pop the rest of the edges out
+            pq.pop();
+            if (pq.size() > adj.size()) return;
+        }
+
+        // and repeat~
+    }
+    
+    return;
+}
+
+
+void Graph::Serial_Dijkstra(Vertex start, Vertex end) {
+
+    solution_edges.clear();
+    thread_solution_edges.clear();
+    path_edges.clear();
+    
+    int sum = 0;
+    double inf = 1.0 / 0.0; 
+    std::vector<double> dist(adj.size(), inf);
+    std::vector<int> prev(adj.size(), -1);
+
+    // Update with starting vertex
+    dist[start.val] = 0; // update dist
+    prev[start.val] = start.val; // update prev
+
+    // The minimum priority queue pq stores the edges by edge weight.
+    auto compare = [](Edge e, Edge f) {return (e.get_weight() > f.get_weight());};
+    std::priority_queue<Edge, std::vector<Edge>, decltype(compare)> pq(compare);
+
+    std::vector<int> visited(adj.size(), 0); // A visited set for partitioning. Entries are 0 for not visited, and 1 for visited.
+    visited[start.val] = 1;
+
+    std::vector<Vertex> pivot_vertices = {start}; // A set of used vertices
+
+    for (int i = 0; i < adj.size()-1; i++) { // Iterate through number of 'turns'
+        for (Vertex pivot_vertex : pivot_vertices) { // Iterate through pivot (used) vertices
+            for (auto edge : adj[pivot_vertex.val]) { // Iterate through options per pivot vertex
+                if (edge.get_destination() != pivot_vertex and visited[edge.get_destination().val] == 0) { // If this edge is not directed towards the pivot and the new vertex has not already been visited
+                    if (dist[edge.get_other(pivot_vertex).val] > (dist[pivot_vertex.val] + edge.get_weight())) { // If the distance can be improved
+                        dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight()); // Then update the dist vector with new dist
+                    }
+                    Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]); // Update dist vector with old dist + weight
+                    // heuristic_reweight(new_edge, new_edge.get_destination(), end);
                     pq.push(new_edge); // Then push it to the queue
                 }
             }

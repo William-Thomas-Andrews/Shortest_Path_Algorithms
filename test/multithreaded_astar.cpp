@@ -3,11 +3,11 @@
 #include "DeltaField.hpp"
 
 
-void run_all_tests() {
+int main() {
     std::string file_path = "../src/data/data_set/data_london.txt";
     Graph G = Graph(file_path);
 
     DeltaField DF(G);
-    DF.specified_multithreaded_activation(28, 44);
-    DF.specified_standard_activation(28, 44);
+    DF.random_multithreaded_activation();
+    system("mv ../img_gen/file0.png ../static");
 }
