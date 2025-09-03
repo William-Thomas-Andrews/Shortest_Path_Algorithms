@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Install FastFloat 8.0.2 to match your Mac version
+# Install FastFloat 8.0.2
 RUN cd /tmp && \
     wget https://github.com/fastfloat/fast_float/archive/refs/tags/v8.0.2.tar.gz && \
     tar -xzf v8.0.2.tar.gz && \
