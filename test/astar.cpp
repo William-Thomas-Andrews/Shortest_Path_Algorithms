@@ -9,4 +9,11 @@ int main() {
 
     DeltaField DF(G);
     DF.random_standard_activation();
+
+    // Enable for time tests
+    // long long count = 0;
+    // for (int i = 0; i < 1000; i++) {
+    //     count += DF.random_standard_activation();;
+    // }
+    // std::cout << "A* count: " << count << std::endl;
 }

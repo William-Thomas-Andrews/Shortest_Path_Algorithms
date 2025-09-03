@@ -32,7 +32,6 @@ add_executable(multithreaded_astar
     ${SRC_FILES}
 )
 
-
 set(BUILD_TESTS OFF CACHE INTERNAL "" FORCE)
 set(BUILD_BENCHMARKS OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(external/folly/)

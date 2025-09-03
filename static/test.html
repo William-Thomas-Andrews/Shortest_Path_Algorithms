@@ -131,24 +131,23 @@
                 The image is generated dynamically from C++ programs running on the server. Weights are attached to every arrow (edge, or road).
                 <red>Red</red> arrows represent the paths that the algorithm found. In any given iteration, I left colored all paths explored, in order to show the 
                 algorithm's 'thought process,' so to speak. In the multi-threaded approach in particular, <blu>blue</blu> arrows represent 
-                the path corrected by the auxiliary thread, while the <red>red</red> arrows represent aberrant 
-                <strong>A*</strong> path choices that would have resulted in a wrong decision if we hadn't had the auxiliary thread.
+                the auxiliary thread path, while the <red>red</red> arrows represent <strong>A*</strong> path. One can see the two threads working together to find the shortest path.
             </p>
             <p style="font-size: 15px;">
-                My goal was to find an algorithm that starts at a randomly chosen beginning node ("Cur") and reaches a random destination node ("End"), in the least amount of edge explorations as possible. 
+                My goal was to find an algorithm that finds the shortest path from a random beginning node ("Cur") to a random destination node ("End"), with the lowest amount of computation time possible. 
                 I started with plain <strong>Dijkstra's Algorithm</strong>, but quickly realized how 
-                computationally expensive it is, due to it exploring every node around the starting node. Then I implemented the <strong>A* Algorithm</strong> and 
-                was excited that it took very few path searches. However,
+                computationally expensive it is, due to it exploring every node around the starting node. <strong>Dijkstra's Algorithm</strong> averaged <strong>114.814</strong> microseconds of computation. Then I implemented the <strong>A* Algorithm</strong> and 
+                was excited that it took very few path searches, as it averaged <strong>35.845</strong> microseconds of computation time. However,
                 I realized that this algorithm sometimes stumbled upon incorrect answers (paths that are not the shortest path)
-                because heuristic weighting is not perfect. I then put together a
+                because heuristic weighting is not perfect for this type of graph. I then put together a
                 <strong>Multi-Threaded A*</strong> algorithm that used a main thread based on 
                 <strong>A*</strong>, with an auxiliary thread that spawned on main thread activation.
                 This auxiliary thread is essentially <strong>Dijkstra's Algorithm</strong>. Additionally,
                 I added logic to make sure that the <strong>Multi-Threaded Algorithm</strong> 
                 completes when the main and auxiliary thread paths connect. This parallel algorithm 
                 highly decreased the amount of edges searched compared to 
-                <strong>Dijkstra's Algorithm</strong>, while still maintaining accuracy (unlike the 
-                <strong>A* Algorithm</strong>). The parallel algorithm is the best of both worlds, utilizing a combination of the other two algorithms.
+                <strong>Dijkstra's Algorithm</strong>, while still maintaining extremely high accuracy (unlike the 
+                <strong>A* Algorithm</strong>). This <strong>Multi-Threaded Algorithm</strong> averaged <strong>73.078</strong> microseconds of computation time. The parallel algorithm is the best of both worlds, utilizing a combination of the other two algorithms.
             </p>
         </div>
     </div>

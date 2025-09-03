@@ -94,7 +94,7 @@ std::tuple<Vertex, Vertex> Graph::get_random_vertex_pair() {
 
 std::vector<Edge>& Graph::get_solution_edges() { return solution_edges; }
 
-std::vector<Edge>& Graph::get_thread_solution_edges() { return path_edges; }
+std::vector<Edge>& Graph::get_thread_solution_edges() { return thread_solution_edges; }
 
 void Graph::clear_solution() { solution_edges.clear(); }
 
@@ -118,9 +118,9 @@ void Graph::show_solution(int begin, int end, int iteration) {
         else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
         color = "black";
         if (is_solution_edge(edge)) { color = "red"; }
-        if (is_thread_solution_edge(edge)) { color = "blue"; }
+        else if (is_thread_solution_edge(edge)) { color = "blue"; }
         v1_shade_str = "", v2_shade_str ="";
-        if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
+        if (v1.val != begin and v1.val != end and color == "red" )  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
         graph_viz_file << "\t" << v1.val << fmt::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << fmt::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
         graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
@@ -190,7 +190,7 @@ bool Graph::is_solution_edge(Edge edge) {
 }
 
 bool Graph::is_thread_solution_edge(Edge edge) {
-    for (Edge e : path_edges) {
+    for (Edge e : thread_solution_edges) {
         if (e == edge) { return true; }
     }
     return false;
@@ -258,7 +258,7 @@ signed long Graph::potential(Vertex start, Vertex end) {
 
 void Graph::heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
     int heuristic = potential(leading_vertex, end);
-    edge.set_weight(edge.get_weight() + heuristic);
+    edge.set_weight(edge.get_weight() + 0.1*heuristic); // To tone down the heuristic reweighting: alpha = 0.1 
 }
 
 void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
@@ -321,7 +321,7 @@ void Graph::Serial_A_Star(Vertex start, Vertex end) {
 
         
         if (visited[end.val] == visited[best.get_destination().val]) {  // If vertex found:
-            std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !!" << std::endl;
+            // std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !!" << std::endl;
             break;
         }
 
@@ -390,7 +390,7 @@ void Graph::Serial_Dijkstra(Vertex start, Vertex end) {
 
         
         if (visited[end.val] == visited[best.get_destination().val]) {  // If vertex found:
-            std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !!" << std::endl;
+            // std::cout << "We found edge number " << end.val << " with " << best.get_destination().val << " !!" << std::endl;
             break;
         }
 
@@ -477,8 +477,9 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
             thread_solution_edges.push_back(best);
 
             if (visited[best.get_source().val].load() == 1) { 
-                connections++;
-               if (connections > adj.size() / 20) return;
+            //     connections++;
+            //    if (connections > adj.size() / 20) return;
+                return;
             }
 
             visited[best.get_source().val] = 2;
@@ -529,24 +530,24 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
 
         if (visited[best.get_destination().val].load() == 2) { // If vertex is found
             t1.join();
-            for (auto e : solution_edges) {
-                if (visited[e.get_destination().val].load() == 2) {
-                    Edge temp_edge = Edge(e.get_source(), e.get_destination(), dist[e.get_source().val] + thread_dist[e.get_destination().val]); //e.get_weight() + thread_dist[e.get_destination().val]);
-                    final_pq.push(temp_edge);
-                }
-            }
+            // for (auto e : solution_edges) {
+            //     if (visited[e.get_destination().val].load() == 2) {
+            //         Edge temp_edge = Edge(e.get_source(), e.get_destination(), dist[e.get_source().val] + thread_dist[e.get_destination().val]); //e.get_weight() + thread_dist[e.get_destination().val]);
+            //         final_pq.push(temp_edge);
+            //     }
+            // }
 
-            Edge connector_edge = final_pq.top(); final_pq.pop();
+            // Edge connector_edge = final_pq.top(); final_pq.pop();
             // Append prev 
-            for (int at = connector_edge.get_source().val; at != start.val && at != -1; at = prev[at]) {
-                path_edges.push_back(find_edge(prev[at], at));
-            }
-            std::reverse(path_edges.begin(), path_edges.end());
-            path_edges.push_back(connector_edge);
-            // Append forward
-            for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
-                path_edges.push_back(find_edge(at, thread_forward[at].val));
-            }
+            // for (int at = connector_edge.get_source().val; at != start.val && at != -1; at = prev[at]) {
+            //     path_edges.push_back(find_edge(prev[at], at));
+            // }
+            // std::reverse(path_edges.begin(), path_edges.end());
+            // path_edges.push_back(connector_edge);
+            // // Append forward
+            // for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
+            //     path_edges.push_back(find_edge(at, thread_forward[at].val));
+            // }
             return; // Then we have connected the two partitions
         }
 

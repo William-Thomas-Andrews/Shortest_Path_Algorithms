@@ -9,4 +9,11 @@ int main() {
 
     DeltaField DF(G);
     DF.random_dijkstra_activation();
+
+    // Enable for time tests
+    // long long count = 0;
+    // for (int i = 0; i < 1000; i++) {
+    //     count += DF.random_dijkstra_activation();;
+    // }
+    // std::cout << "Dijkstra count: " << count << std::endl;
 }
