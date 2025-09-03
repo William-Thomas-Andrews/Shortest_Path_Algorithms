@@ -10,10 +10,6 @@ The project includes an interactive web interface that demonstrates the algorith
 
 ![Alt text](web.png)
 
-## Example Multithreaded Path (red for edges the main thread found, blue for edges the auxiliary thread found)
-
-![Alt text](example.png)
-
 ## Features
 - Reads data from an easy-to-use json format with Folly.
 - Implements shortest path algorithms (e.g., Dijkstra, A*, Parallel-Bidirectional A*).  
