@@ -1,5 +1,5 @@
 #include <iostream>
-#include <format>
+#include <fmt/format.h>
 #include <fstream>
 #include <string>
 #include <random>
@@ -16,7 +16,7 @@ void data_gen(int i) {
     int max, j;
     
     std::cout << i << std::endl;
-    file.open(std::format("data_{}.txt", i));
+    file.open(fmt::format("data_{}.txt", i));
     file << "{\n";
     file << "\t\"vertices\": [\n";
     max = dist_max_i(rng);

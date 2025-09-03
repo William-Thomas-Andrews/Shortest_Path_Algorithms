@@ -45,12 +45,6 @@ COPY static/ ./static
 COPY scripts/ ./scripts
 COPY img_gen/ ./img_gen
 
-# Replace <format> with <fmt/format.h> and add missing includes
-RUN find . -name "*.cpp" -o -name "*.h" | xargs sed -i 's/#include <format>/#include <fmt\/format.h>/g' && \
-    find . -name "*.cpp" -o -name "*.h" | xargs sed -i 's/std::format/fmt::format/g' && \
-    sed -i '1i#include <climits>' src/utils/Matrix.cpp && \
-    sed -i '4i#include <atomic>' src/utils/Utils.hpp
-
 # Configure and build (this will rebuild when any C++ files change)
 RUN mkdir build && cd build && \
     cmake .. -DCMAKE_CXX_STANDARD=20 && \

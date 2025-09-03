@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <queue>
 #include <filesystem>
-#include <format>
+#include <fmt/format.h>
 #include <thread>
 #include <tuple>
 #include <atomic>
@@ -110,10 +110,10 @@ void Graph::add_element(Edge e) {
 }
 
 void Graph::show_solution(int begin, int end, int iteration) {
-    // system(std::format("rm ../img_gen/g{}.gv ; rm ../static/display{}.png", iteration, iteration).c_str());
+    // system(fmt::format("rm ../img_gen/g{}.gv ; rm ../static/display{}.png", iteration, iteration).c_str());
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
-    graph_viz_file.open(std::format("../img_gen/g{}.gv", iteration));
+    graph_viz_file.open(fmt::format("../img_gen/g{}.gv", iteration));
     graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
     Vertex v1, v2;
     for (Edge edge : edges) {
@@ -127,9 +127,9 @@ void Graph::show_solution(int begin, int end, int iteration) {
         v1_shade_str = "", v2_shade_str ="";
         if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
-        graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
-        graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
-        graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
+        graph_viz_file << "\t" << v1.val << fmt::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << fmt::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+        graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+        graph_viz_file << "\t" << v1.val << " -> " << v2.val << fmt::format(" [color=\"{}\"", color) << fmt::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
     // std::cout << solution_edges.size();
     graph_viz_file << "}";
@@ -138,9 +138,9 @@ void Graph::show_solution(int begin, int end, int iteration) {
     // solution_edges.clear();
     // thread_solution_edges.clear();
 
-    // system(std::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
-    // system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
-    system(std::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../static/display{}.png ", iteration, iteration).c_str());
+    // system(fmt::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
+    // system(fmt::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
+    system(fmt::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../static/display{}.png ", iteration, iteration).c_str());
 }
 
 void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
@@ -159,9 +159,9 @@ void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
         v1_shade_str = "", v2_shade_str ="";
         if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
-        graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
-        graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
-        graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
+        graph_viz_file << "\t" << v1.val << fmt::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << fmt::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+        graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+        graph_viz_file << "\t" << v1.val << " -> " << v2.val << fmt::format(" [color=\"{}\"", color) << fmt::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
     // std::cout << solution_edges.size();
     graph_viz_file << "}";
@@ -184,9 +184,9 @@ void Graph::plot_path(const std::vector<int>& prev, int begin, int end) {
         v1_shade_str = "", v2_shade_str ="";
         if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
-        graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
-        graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
-        graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
+        graph_viz_file << "\t" << v1.val << fmt::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << fmt::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
+        graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
+        graph_viz_file << "\t" << v1.val << " -> " << v2.val << fmt::format(" [color=\"{}\"", color) << fmt::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
     // std::cout << solution_edges.size();
     graph_viz_file << "}";

@@ -1,3 +1,5 @@
+#include <climits>
+
 #include "Matrix.hpp"
 
 Matrix::Matrix() {}
