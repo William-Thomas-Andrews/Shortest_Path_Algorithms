@@ -14,7 +14,7 @@ The project includes an interactive web interface that demonstrates the algorith
 - Reads data from an easy-to-use json format with Folly.
 - Implements shortest path algorithms (e.g., Dijkstra, A*, Parallel-Bidirectional A*).  
 - The bidirectional A* algorithm uses **std::thread** to parallelize the normal A* algorithm to achieve better results than the single-threaded normal version.
-- **Interactive web interface for real-time algorithm visualization.
+- **Interactive web interface** for real-time algorithm visualization.
 - Supports directed weighted graphs.
 - Includes test cases and benchmarks.
 - Includes a C-style array-based **Matrix** class.
