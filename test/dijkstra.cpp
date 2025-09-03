@@ -9,6 +9,4 @@ int main() {
 
     DeltaField DF(G);
     DF.random_dijkstra_activation();
-    // system("mv ../img_gen/file0.png ../static");
-    // std::cout << "hereee \n\n\n" << std::endl;
 }

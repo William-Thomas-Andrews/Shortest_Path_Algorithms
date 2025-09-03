@@ -50,3 +50,7 @@ Makefile
 
 # ---- Deprecated folders ----
 neural_net
+
+
+# ---- VSCode ----
+.vscode

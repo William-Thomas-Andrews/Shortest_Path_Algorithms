@@ -20,9 +20,6 @@ def serve_test():
     return send_from_directory("static", "test.html")
 
 def run_algorithm_script(script_name, algo_name):
-    """
-    Helper function to run algorithm scripts with proper error handling
-    """
     try:
         logger.info(f"Starting {algo_name} algorithm...")
         logger.info(f"Current working directory: {os.getcwd()}")
