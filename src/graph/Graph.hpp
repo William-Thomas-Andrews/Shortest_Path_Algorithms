@@ -46,8 +46,6 @@ class Graph {
 
         void add_element(Edge e);
 
-        void show_solution(int begin, int end);
-
         void show_solution(int begin, int end, int iteration);
 
         void write_solution(const std::vector<int>& prev, int begin, int end);

@@ -9,5 +9,5 @@ int main() {
 
     DeltaField DF(G);
     DF.random_multithreaded_activation();
-    system("mv ../img_gen/file0.png ../static");
+    // system("mv ../img_gen/file0.png ../static");
 }

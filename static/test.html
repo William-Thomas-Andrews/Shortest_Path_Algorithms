@@ -10,6 +10,14 @@
         }
         h1 {
             text-align: center;
+            margin: 0px;
+        }
+        h2 {
+            margin: 0px;
+        }
+        p {
+            margin: 6px;
+            
         }
 
         /* Put graph+buttons on the left, description on the right */
@@ -32,6 +40,7 @@
             width: 800px;
             height: 650px;
             border: 1px solid #ccc;
+            background-color: #f9f9f9;
         }
 
         .button-group {
@@ -43,6 +52,18 @@
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+        .button-group button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
         }
 
         .description {
@@ -55,6 +76,35 @@
             font-size: 16px;
             line-height: 1.5;
         }
+
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            display: none;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        blu {
+            color: blue;
+        }
+        red {
+            color: rgb(255, 0, 0);
+        }
     </style>
 </head>
 <body>
@@ -63,42 +113,124 @@
     <div class="main-container">
         <!-- Left side -->
         <div class="graph-container">
-            <img id="graphImage" src="file0.png" alt="Graph">
+            <img id="graphImage" src="display0.png" alt="Graph" onerror="handleImageError()">
             <div class="button-group">
                 <button onclick="reloadGraph(0)">Dijkstra's Algorithm</button>
                 <button onclick="reloadGraph(1)">A* (A-Star)</button>
                 <button onclick="reloadGraph(2)">Multi-Threaded A*</button>
             </div>
+            <div id="status" class="status"></div>
         </div>
 
         <!-- Right side -->
         <div class="description">
             <h2>Project Description</h2>
-            <p>
-                This project demonstrates shortest path algorithms on a graph.
+            <p style="font-size: 15px;">
+                This project demonstrates multiple shortest path (minimizing weight) algorithms on a graph which is meant to resemble a small part of the London transit system.
                 Click the buttons to generate an updated graph using your chosen algorithm:
                 <strong>Dijkstra</strong>, <strong>A*</strong>, or <strong>Multi-Threaded A*</strong>.
-                The image is generated dynamically from C++ programs running on the server.
+                The image is generated dynamically from C++ programs running on the server. Weights are attached to every arrow (edge, or road).
+                <red>Red</red> arrows represent the paths that the algorithm found. In any given iteration, I left colored all paths explored, in order to show the 
+                algorithm's 'thought process,' so to speak. In the multi-threaded approach in particular, <blu>blue</blu> arrows represent 
+                the path corrected by the auxiliary thread, while the <red>red</red> arrows represent aberrant 
+                <strong>A*</strong> path choices that would have resulted in a wrong decision if we hadn't had the auxiliary thread.
             </p>
+            <p style="font-size: 15px;">
+                My goal was to find an algorithm that starts at a randomly chosen beginning node ("Cur") and reaches a random destination node ("End"), in the least amount of edge explorations as possible. 
+                I started with plain <strong>Dijkstra's Algorithm</strong>, but quickly realized how 
+                computationally expensive it is, due to it exploring every node around the starting node. Then I implemented the <strong>A* Algorithm</strong> and 
+                was excited that it took very few path searches. However,
+                I realized that this algorithm sometimes stumbled upon incorrect answers (paths that are not the shortest path)
+                because heuristic weighting is not perfect. I then put together a
+                <strong>Multi-Threaded A*</strong> algorithm that used a main thread based on 
+                <strong>A*</strong>, with an auxiliary thread that spawned on main thread activation.
+                This auxiliary thread is essentially <strong>Dijkstra's Algorithm</strong>. Additionally,
+                I added logic to make sure that the <strong>Multi-Threaded Algorithm</strong> 
+                completes when the main and auxiliary thread paths connect. This parallel algorithm 
+                highly decreased the amount of edges searched compared to 
+                <strong>Dijkstra's Algorithm</strong>, while still maintaining accuracy (unlike the 
+                <strong>A* Algorithm</strong>). The parallel algorithm is the best of both worlds, utilizing a combination of the other two algorithms.
+            </p>
+            
+            <!-- <h2>Setup Instructions</h2>
+            <p>
+                <strong>For Docker:</strong><br>
+                1. Build: <code>docker build -t graph-demo .</code><br>
+                2. Run: <code>docker run -p 8080:8080 graph-demo</code><br>
+                3. Visit: <code>http://localhost:8080</code>
+            </p>
+            
+            <p>
+                <strong>For native macOS:</strong><br>
+                1. Install: <code>brew install cmake libpng</code><br>
+                2. Build: <code>mkdir build && cd build && cmake .. && make</code><br>
+                3. Serve: <code>python3 -m http.server 8000</code>
+            </p> -->
         </div>
     </div>
 
     <script>
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+            
+            if (type !== 'loading') {
+                setTimeout(() => {
+                    status.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        function handleImageError() {
+            const img = document.getElementById('graphImage');
+            img.style.backgroundColor = '#ffe6e6';
+            img.alt = 'Loading ...';
+            showStatus('Image not found. Check if display0.png exists.', 'error');
+        }
+
         function reloadGraph(index) {
             const buttons = document.querySelectorAll("button");
-            buttons.forEach(btn => btn.disabled = true); // disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+            showStatus('Generating graph...', 'loading');
 
             const img = document.getElementById("graphImage");
+            
             fetch(`/generate_${index}`)
-                .then(() => {
-                    // Cache-busting
-                    img.src = `file${index}.png?t=${new Date().getTime()}`;
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    return response.json();
                 })
-                .catch(err => console.error(err))
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Wait a moment for file system to update
+                        setTimeout(() => {
+                            img.src = `display0.png?t=${new Date().getTime()}`;
+                            showStatus('Graph generated successfully!', 'success');
+                        }, 500);
+                    } else {
+                        throw new Error('C++ program failed to generate image');
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showStatus(`Error: ${err.message}`, 'error');
+                })
                 .finally(() => {
                     buttons.forEach(btn => btn.disabled = false);
                 });
         }
+
+        // Check if image loads on page load
+        window.onload = function() {
+            const img = document.getElementById('graphImage');
+            img.onload = function() {
+                showStatus('Graph loaded successfully!', 'success');
+            };
+        };
     </script>
 </body>
 </html>

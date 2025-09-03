@@ -17,14 +17,12 @@
 Graph::Graph() {}
 Graph::Graph(int size) : union_set(UnionFind(size)), adj(size) {}
 Graph::Graph(std::string file_path) {
-    std::cout << file_path << std::endl;
+    std::cout << "Parsing from: " << file_path << std::endl;
     system("pwd");
     folly::dynamic data = parse_json(file_path);
     Vertex v1, v2;
     Weight weight;
-    
-    // adj.resize(data["edges"].size() * 2);
-    adj.resize(data["vertices"].size());
+        adj.resize(data["vertices"].size());
     adjacency_matrix = Matrix(data["vertices"].size(), data["vertices"].size());
     for (auto edge : data["edges"]) {
         v1 = Vertex(
@@ -44,10 +42,9 @@ Graph::Graph(std::string file_path) {
         this->add_element(Edge(v1, v2, weight));
         adjacency_matrix(v1.val, v2.val) = weight;
         ordered_vertices.push_back(v1); ordered_vertices.push_back(v2);
-        // std::cout << v1.val << " " << v2.val << std::endl; 
     }
     // GenerateGraph();
-    std::cout << &ordered_vertices << std::endl;
+    // std::cout << &ordered_vertices << std::endl; // Prints address for reference (if needed)
 }
 
 Graph& Graph::operator=(const Graph& other) {
@@ -65,23 +62,13 @@ Graph& Graph::operator=(const Graph& other) {
     return *this;
 }
 
-// void Graph::operator=(const Graph& other) {
-//     edges = other.edges;
-//     union_set = other.union_set;
-//     adj = other.adj;
-//     stored_vertices = other.stored_vertices;
-//     union_vertices = other.union_vertices;
-//     solution_edges = other.solution_edges;
-//     ordered_vertices = other.ordered_vertices;
-// }
-
 Vertex Graph::operator[](int vertex_index) {
     for (Vertex v : ordered_vertices) { if (vertex_index == v.val) { return v; } }
     return Vertex();
 }
 
 folly::dynamic Graph::parse_json(std::string file_path) {
-    std::cout << std::filesystem::current_path() << std::endl;
+    // std::cout << "Parsing from: " << std::filesystem::current_path() << std::endl;
     std::string output = "";
     std::ifstream file(file_path);
     std::string line;
@@ -122,38 +109,8 @@ void Graph::add_element(Edge e) {
     adj[e.get_destination().val].push_back(e);
 }
 
-
-void Graph::show_solution(int begin, int end) {
-    std::ofstream graph_viz_file;
-    std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
-    graph_viz_file.open("../img_gen/g.gv");
-    graph_viz_file << "digraph G {\n\tgraph [pad=\"0.212,0.055\" bgcolor=lightgray]\n\tnode [style=filled]\n\tsplines=true" << std::endl ;
-    Vertex v1, v2;
-    for (Edge edge : edges) {
-        v1 = edge.get_source(); v2 = edge.get_destination();
-        v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
-        if (v1.val == begin) v1_label = "Cur.";   if (v2.val == begin) v2_label = "Cur.";
-        else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
-        color = "black";
-        if (is_solution_edge(edge)) { color = "red"; }
-        v1_shade_str = "", v2_shade_str ="";
-        if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
-        if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
-        graph_viz_file << "\t" << v1.val << std::format(" [label=\"{}\", {}{}{}", (v1_label), (v1.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v1.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v1_shade_str) << std::format("pos=\"{},{}!\"]", v1.x, v1.y) << std::endl;
-        graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
-        graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
-    }
-    std::cout << solution_edges.size();
-    graph_viz_file << "}";
-    graph_viz_file.close();
-
-    solution_edges.clear();
-
-    system("neato -n2 -Tpng ../img_gen/g.gv -o ../img_gen/file1.png ; open ../img_gen/file1.png");
-}
-
 void Graph::show_solution(int begin, int end, int iteration) {
-    system(std::format("rm ../img_gen/g{}.gv ; rm ../static/display{}.png", iteration, iteration).c_str());
+    // system(std::format("rm ../img_gen/g{}.gv ; rm ../static/display{}.png", iteration, iteration).c_str());
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
     graph_viz_file.open(std::format("../img_gen/g{}.gv", iteration));
@@ -166,7 +123,7 @@ void Graph::show_solution(int begin, int end, int iteration) {
         else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
         color = "black";
         if (is_solution_edge(edge)) { color = "red"; }
-        else if (is_thread_solution_edge(edge)) { color = "blue"; }
+        if (is_thread_solution_edge(edge)) { color = "blue"; }
         v1_shade_str = "", v2_shade_str ="";
         if (v1.val != begin and v1.val != end and color == "red")  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
@@ -206,7 +163,7 @@ void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
         graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
         graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
-    std::cout << solution_edges.size();
+    // std::cout << solution_edges.size();
     graph_viz_file << "}";
     graph_viz_file.close();
 }
@@ -231,7 +188,7 @@ void Graph::plot_path(const std::vector<int>& prev, int begin, int end) {
         graph_viz_file << "\t" << v2.val << std::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << std::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
         graph_viz_file << "\t" << v1.val << " -> " << v2.val << std::format(" [color=\"{}\"", color) << std::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
-    std::cout << solution_edges.size();
+    // std::cout << solution_edges.size();
     graph_viz_file << "}";
     graph_viz_file.close();
 
@@ -538,10 +495,10 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
 
             // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
             Edge best = thread_pq.top(); thread_pq.pop();
-            std::cout << "=======Thread chose the best: \n\n" << best << std::endl;
+            // std::cout << "=======Thread chose the best: \n\n" << best << std::endl;
             // prev[best.get_destination().val] = best.get_source().val;
             thread_forward[best.get_source().val] = best.get_destination();
-            thread_solution_edges.push_back(best); // not yet
+            thread_solution_edges.push_back(best);
 
             if (visited[best.get_source().val].load() == 1) { 
                 connections++;
@@ -592,7 +549,7 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
         
         Edge best = pq.top(); pq.pop(); // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
         solution_edges.push_back(best);
-        std::cout << "=======Main chose the best: \n\n" << best << std::endl;
+        // std::cout << "=======Main chose the best: \n\n" << best << std::endl;
         prev[best.get_destination().val] = best.get_source().val;
 
         if (visited[best.get_destination().val].load() == 2) { // If vertex is found
@@ -615,9 +572,9 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
             for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
                 path_edges.push_back(find_edge(at, thread_forward[at].val));
             }
-            std::cout << "min_thread_dist: " << min_thread_dist << std::endl;
+            // std::cout << "min_thread_dist: " << min_thread_dist << std::endl;
             for (auto& x : visited) {
-                std::cout << "Visited: " << x << std::endl;
+                // std::cout << "Visited: " << x << std::endl;
             }
             return; // Then we have connected the two partitions
         }
