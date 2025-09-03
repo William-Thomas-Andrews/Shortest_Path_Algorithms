@@ -34,10 +34,3 @@ void data_gen(int i) {
     file << "\t]\n";
     file << "}";
 }
-
-// int main() {
-//     for (int i = 0; i < 9; i++) {
-//         data_gen(i);
-//     }
-//     return 0;
-// }

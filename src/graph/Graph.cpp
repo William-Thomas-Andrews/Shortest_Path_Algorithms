@@ -43,8 +43,6 @@ Graph::Graph(std::string file_path) {
         adjacency_matrix(v1.val, v2.val) = weight;
         ordered_vertices.push_back(v1); ordered_vertices.push_back(v2);
     }
-    // GenerateGraph();
-    // std::cout << &ordered_vertices << std::endl; // Prints address for reference (if needed)
 }
 
 Graph& Graph::operator=(const Graph& other) {
@@ -68,7 +66,6 @@ Vertex Graph::operator[](int vertex_index) {
 }
 
 folly::dynamic Graph::parse_json(std::string file_path) {
-    // std::cout << "Parsing from: " << std::filesystem::current_path() << std::endl;
     std::string output = "";
     std::ifstream file(file_path);
     std::string line;
@@ -92,7 +89,6 @@ std::tuple<Vertex, Vertex> Graph::get_random_vertex_pair() {
         v2 = stored_vertices[rand() % union_set.get_size()]; 
         if (++count > 1000) throw std::runtime_error("Error in processing random vertices from the stored_vertices vector."); 
     }
-    // std::cout << rand() % stored_vertices.size() << std::endl;
     return {v1, v2};
 }
 
@@ -110,7 +106,6 @@ void Graph::add_element(Edge e) {
 }
 
 void Graph::show_solution(int begin, int end, int iteration) {
-    // system(fmt::format("rm ../img_gen/g{}.gv ; rm ../static/display{}.png", iteration, iteration).c_str());
     std::ofstream graph_viz_file;
     std::string line, str, color, v1_label, v2_label, v1_shade_str, v2_shade_str;
     graph_viz_file.open(fmt::format("../img_gen/g{}.gv", iteration));
@@ -131,15 +126,9 @@ void Graph::show_solution(int begin, int end, int iteration) {
         graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
         graph_viz_file << "\t" << v1.val << " -> " << v2.val << fmt::format(" [color=\"{}\"", color) << fmt::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
-    // std::cout << solution_edges.size();
     graph_viz_file << "}";
     graph_viz_file.close();
 
-    // solution_edges.clear();
-    // thread_solution_edges.clear();
-
-    // system(fmt::format("killall Preview ; neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
-    // system(fmt::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../img_gen/file{}.png ; open ../img_gen/file{}.png", iteration, iteration, iteration).c_str());
     system(fmt::format(" neato -n2 -Tpng ../img_gen/g{}.gv -o ../static/display{}.png ", iteration, iteration).c_str());
 }
 
@@ -163,7 +152,6 @@ void Graph::write_solution(const std::vector<int>& prev, int begin, int end) {
         graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
         graph_viz_file << "\t" << v1.val << " -> " << v2.val << fmt::format(" [color=\"{}\"", color) << fmt::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
-    // std::cout << solution_edges.size();
     graph_viz_file << "}";
     graph_viz_file.close();
 }
@@ -188,7 +176,6 @@ void Graph::plot_path(const std::vector<int>& prev, int begin, int end) {
         graph_viz_file << "\t" << v2.val << fmt::format(" [label=\"{}\", {}{}{}", (v2_label), (v2.val == begin ? "fillcolor=\"#7b9aa7ff\"" : ""), (v2.val == end ? "fillcolor=\"#ae9b0bff\"" : ""), v2_shade_str) << fmt::format("pos=\"{},{}!\"]", v2.x, v2.y) << std::endl;
         graph_viz_file << "\t" << v1.val << " -> " << v2.val << fmt::format(" [color=\"{}\"", color) << fmt::format(" label=\"{}\"]", std::to_string(edge.get_weight())) << std::endl;
     }
-    // std::cout << solution_edges.size();
     graph_viz_file << "}";
     graph_viz_file.close();
 
@@ -199,7 +186,6 @@ bool Graph::is_solution_edge(Edge edge) {
     for (Edge e : solution_edges) {
         if (e == edge) { return true; }
     }
-    // std::cout << edge << std::endl;
     return false;
 }
 
@@ -207,7 +193,6 @@ bool Graph::is_thread_solution_edge(Edge edge) {
     for (Edge e : path_edges) {
         if (e == edge) { return true; }
     }
-    // std::cout << edge << std::endl;
     return false;
 }
 
@@ -273,7 +258,6 @@ signed long Graph::potential(Vertex start, Vertex end) {
 
 void Graph::heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
     int heuristic = potential(leading_vertex, end);
-    // std::cout << "-Potential: " << potential(edge.get_other(leading_vertex), end) << ". Potential: " << potential(leading_vertex, end) << ". Diff: " << heuristic << std::endl;
     edge.set_weight(edge.get_weight() + heuristic);
 }
 
@@ -385,7 +369,7 @@ void Graph::Serial_Dijkstra(Vertex start, Vertex end) {
                         dist[edge.get_other(pivot_vertex).val] = (dist[pivot_vertex.val] + edge.get_weight()); // Then update the dist vector with new dist
                     }
                     Edge new_edge = Edge(edge.get_source(), edge.get_destination(), edge.get_weight()+dist[pivot_vertex.val]); // Update dist vector with old dist + weight
-                    // heuristic_reweight(new_edge, new_edge.get_destination(), end);
+                    // heuristic_reweight(new_edge, new_edge.get_destination(), end); // Enable for A* capabilities
                     pq.push(new_edge); // Then push it to the queue
                 }
             }
@@ -398,7 +382,6 @@ void Graph::Serial_Dijkstra(Vertex start, Vertex end) {
         
         Edge best = pq.top(); pq.pop(); // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
         solution_edges.push_back(best);
-        // std::cout << "=======We chose the best: " << best << std::endl;
         prev[best.get_destination().val] = best.get_source().val;
         visited[best.get_destination().val] = 1;
         sum += best.get_weight();
@@ -428,11 +411,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
     solution_edges.clear();
     thread_solution_edges.clear();
     path_edges.clear();
-
-    // If the start is right next to the end, then quickly get it and return
-    // if (find_edge(start, end)) {
-    //     path_edges.push_back()
-    // }
 
     int sum = 0;
     double inf = 1.0/ 0.0; 
@@ -493,10 +471,8 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
                 return; 
             }
 
-            // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
+            // Take top value of queue
             Edge best = thread_pq.top(); thread_pq.pop();
-            // std::cout << "=======Thread chose the best: \n\n" << best << std::endl;
-            // prev[best.get_destination().val] = best.get_source().val;
             thread_forward[best.get_source().val] = best.get_destination();
             thread_solution_edges.push_back(best);
 
@@ -549,7 +525,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
         
         Edge best = pq.top(); pq.pop(); // Take top value of queue, then that is the turn, so update prev and add the vertex that has not been used to the used pivot_vertices
         solution_edges.push_back(best);
-        // std::cout << "=======Main chose the best: \n\n" << best << std::endl;
         prev[best.get_destination().val] = best.get_source().val;
 
         if (visited[best.get_destination().val].load() == 2) { // If vertex is found
@@ -572,10 +547,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
             for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
                 path_edges.push_back(find_edge(at, thread_forward[at].val));
             }
-            // std::cout << "min_thread_dist: " << min_thread_dist << std::endl;
-            for (auto& x : visited) {
-                // std::cout << "Visited: " << x << std::endl;
-            }
             return; // Then we have connected the two partitions
         }
 
@@ -596,9 +567,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
     t1.join();
     return;
 }
-
-
-
 
 
 

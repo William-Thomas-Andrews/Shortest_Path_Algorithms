@@ -249,15 +249,6 @@ Matrix Matrix::Transpose() {
     return B;
 }
 
-// Matrix Matrix::operator()(int row_index) {
-//     if (rows <= row_index) { throw std::out_of_range("Row index out of range"); }
-//     if (0 > row_index) { throw std::out_of_range("Row index cannot be negative"); }
-//     double *return_data = (double *) malloc(columns * sizeof(double));
-//     for (int i = 0; i < columns; i++) {
-//         return_data[i] = matrix_array[i + row_index*columns];
-//     }
-//     return Matrix(return_data, columns, 1, columns);
-// }
 
 double& Matrix::operator()(int row_index, int col_index) const {
     if (rows <= row_index) { std::cout << "Dims: " << rows << "x" << columns << "\rRow index: " << row_index << std::endl; throw std::out_of_range("Row index out of range"); }

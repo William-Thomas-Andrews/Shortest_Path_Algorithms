@@ -50,7 +50,6 @@ class Matrix {
         double sum_row(int row);
 
         Matrix Transpose();
-        // Matrix operator()(int row_index) ;
         double& operator()(int row_index, int col_index) const ;
         void clear();
 

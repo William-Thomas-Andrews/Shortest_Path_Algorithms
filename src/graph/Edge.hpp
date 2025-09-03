@@ -21,13 +21,10 @@ class Edge {
         Vertex get_other(Vertex v);
         void set_weight(Weight w);
         
-        // Comparison operator <
+        // Comparison operators
         bool operator<(Edge& e2);
-        // Comparison operator >
         bool operator>(Edge& e2);
-        // Comparison operator ==
         bool operator==(Edge& e2);
-        // Comparison operator !=
         bool operator!=(Edge& e2);
 
         friend std::ostream& operator<<(std::ostream& os, Edge& e);
