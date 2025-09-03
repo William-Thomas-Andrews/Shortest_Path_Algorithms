@@ -148,9 +148,6 @@ def serve_static(filename):
 # Serve display images specifically from static directory
 @app.route('/display<int:num>.png')
 def serve_display_image(num):
-    """
-    Serve display images from static directory
-    """
     filename = f"display{num}.png"
     static_path = os.path.join("static", filename)
     logger.info(f"Attempting to serve {filename} from static directory")
@@ -170,9 +167,6 @@ def serve_display_image(num):
 # Serve other files from root directory
 @app.route('/<path:path>')
 def static_files(path):
-    """
-    Serve other files from the root directory
-    """
     # Skip display images as they're handled above
     if path.startswith('display') and path.endswith('.png'):
         return serve_display_image(int(path[7:-4]))
