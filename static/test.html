@@ -20,12 +20,11 @@
             
         }
 
-        /* Put graph+buttons on the left, description on the right */
         .main-container {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 40px; /* space between image/buttons and description */
+            gap: 40px; 
             margin-top: 20px;
         }
 
@@ -151,21 +150,6 @@
                 <strong>Dijkstra's Algorithm</strong>, while still maintaining accuracy (unlike the 
                 <strong>A* Algorithm</strong>). The parallel algorithm is the best of both worlds, utilizing a combination of the other two algorithms.
             </p>
-            
-            <!-- <h2>Setup Instructions</h2>
-            <p>
-                <strong>For Docker:</strong><br>
-                1. Build: <code>docker build -t graph-demo .</code><br>
-                2. Run: <code>docker run -p 8080:8080 graph-demo</code><br>
-                3. Visit: <code>http://localhost:8080</code>
-            </p>
-            
-            <p>
-                <strong>For native macOS:</strong><br>
-                1. Install: <code>brew install cmake libpng</code><br>
-                2. Build: <code>mkdir build && cd build && cmake .. && make</code><br>
-                3. Serve: <code>python3 -m http.server 8000</code>
-            </p> -->
         </div>
     </div>
 
@@ -206,7 +190,6 @@
                 })
                 .then(data => {
                     if (data.status === 'success') {
-                        // Wait a moment for file system to update
                         setTimeout(() => {
                             img.src = `display0.png?t=${new Date().getTime()}`;
                             showStatus('Graph generated successfully!', 'success');
