@@ -8,7 +8,7 @@ The goal is to explore high-performance implementations of graph routing algorit
 
 The project includes an interactive web interface that demonstrates the algorithm in real-time, generating dynamic vizualizations of the pathfinding process.
 
-![Alt text](web.png)
+![Alt text](example_page.png)
 
 ## Features
 - Reads data from an easy-to-use json format with Folly.
