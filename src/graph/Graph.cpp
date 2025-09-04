@@ -115,10 +115,10 @@ void Graph::show_solution(int begin, int end, int iteration) {
         v1 = edge.get_source(); v2 = edge.get_destination();
         v1_label = std::to_string(v1.val), v2_label = std::to_string(v2.val);
         if (v1.val == begin) v1_label = "Cur.";   if (v2.val == begin) v2_label = "Cur.";
-        else if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
+        if (v1.val == end) v1_label = "End";  else if (v2.val == end) v2_label = "End";
         color = "black";
         if (is_solution_edge(edge)) { color = "red"; }
-        else if (is_thread_solution_edge(edge)) { color = "blue"; }
+        if (is_thread_solution_edge(edge)) { color = "blue"; }
         v1_shade_str = "", v2_shade_str ="";
         if (v1.val != begin and v1.val != end and color == "red" )  { v1_shade_str = "fillcolor=\"#6f6f6fff\""; }
         if (v2.val != begin and v2.val != end and color == "red")  { v2_shade_str = "fillcolor=\"#6f6f6fff\""; }
@@ -258,7 +258,7 @@ signed long Graph::potential(Vertex start, Vertex end) {
 
 void Graph::heuristic_reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
     int heuristic = potential(leading_vertex, end);
-    edge.set_weight(edge.get_weight() + 0.1*heuristic); // To tone down the heuristic reweighting: alpha = 0.1 
+    edge.set_weight(edge.get_weight() + heuristic);
 }
 
 void Graph::reweight(Edge& edge, Vertex leading_vertex, Vertex end) {
@@ -438,8 +438,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
     std::vector<Vertex> pivot_vertices = {start};
     std::vector<Vertex> thread_pivot_vertices = {end};
 
-    int connections = 0;
-
     double min_thread_dist = inf;
 
 
@@ -477,8 +475,6 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
             thread_solution_edges.push_back(best);
 
             if (visited[best.get_source().val].load() == 1) { 
-            //     connections++;
-            //    if (connections > adj.size() / 20) return;
                 return;
             }
 
@@ -529,25 +525,7 @@ void Graph::Parallel_A_Star(Vertex start, Vertex end) {
         prev[best.get_destination().val] = best.get_source().val;
 
         if (visited[best.get_destination().val].load() == 2) { // If vertex is found
-            t1.join();
-            // for (auto e : solution_edges) {
-            //     if (visited[e.get_destination().val].load() == 2) {
-            //         Edge temp_edge = Edge(e.get_source(), e.get_destination(), dist[e.get_source().val] + thread_dist[e.get_destination().val]); //e.get_weight() + thread_dist[e.get_destination().val]);
-            //         final_pq.push(temp_edge);
-            //     }
-            // }
-
-            // Edge connector_edge = final_pq.top(); final_pq.pop();
-            // Append prev 
-            // for (int at = connector_edge.get_source().val; at != start.val && at != -1; at = prev[at]) {
-            //     path_edges.push_back(find_edge(prev[at], at));
-            // }
-            // std::reverse(path_edges.begin(), path_edges.end());
-            // path_edges.push_back(connector_edge);
-            // // Append forward
-            // for (int at = connector_edge.get_destination().val; at != end.val && at != -1; at = thread_forward[at].val) {
-            //     path_edges.push_back(find_edge(at, thread_forward[at].val));
-            // }
+            t1.join(); // Collect back thread t1
             return; // Then we have connected the two partitions
         }
 
