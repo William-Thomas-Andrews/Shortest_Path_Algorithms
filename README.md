@@ -57,3 +57,15 @@ cd scripts/
 ## Usage
 - **Web Interface**: After running the Docker container, navigate to http://localhost:8000 to access the interactive demonstration.
 - **Command Line**: Use the native build option for direct C++ execution and benchmarking.
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Third-Party Libraries
+
+This project uses the following open source libraries:
+- [Folly](https://github.com/facebook/folly) - Apache 2.0 License
+- [Flask](https://github.com/pallets/flask) - BSD 3-Clause License
+- [fmt](https://github.com/fmtlib/fmt) - MIT License
